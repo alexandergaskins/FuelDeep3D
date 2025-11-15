@@ -95,7 +95,7 @@ conda_create(
 #    Example if it lives at: src/requirements.txt
 req_file <- file.path(getwd(), "src", "requirements.txt")
 # If you're running this from inside the installed package, you can also use:
-# req_file <- system.file("python", "requirements.txt", package = "vegseg")
+# req_file <- system.file("src", "requirements.txt", package = "vegseg")
 
 conda_install(
   envname  = "pointnext",
