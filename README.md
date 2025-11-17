@@ -1,3 +1,8 @@
+<p align="center">
+  <img src="readme/logo_gif.gif" alt="Single tree segmentation output" width="45%">
+</p>
+
+
 
 # vegseg: Tree Segmentation with LiDAR + PyTorch (R + Python)
 
