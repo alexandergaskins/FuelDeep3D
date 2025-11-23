@@ -170,3 +170,25 @@ Each point is colored by its predicted class (e.g., ground/understory, stem, can
 In this example, the model was trained on `trees.las` and then used to predict labels for the
 same scene. The output LAS (`trees_predicted.las`) stores predictions in the `classification`
 field, which can be visualized in tools like CloudCompare or QGIS using a class-based color ramp.
+
+# Acknowledgements
+
+We gratefully acknowledge funding from NASA’s ICESat-2 (ICESat-2, grant
+22-ICESat2_22-0006), Carbon Monitoring System (CMS, grant 22-CMS22-0015)
+and Commercial Smallsat Data Scientific Analysis(CSDSA, grant
+22-CSDSA22_2-0080).
+
+# Reporting Issues
+
+Please report any issue regarding the ICESat2VegR package to Venkata Siva Reddy Naga(<vs.naga@ufl.edu>)  or Dr. Silva
+(<c.silva@ufl.edu>).
+# Citing ICESat2VegR
+
+Venkata Siva Naga; Silva,C.A. FuelDeep3D: An R R wrapper around a PyTorch point-cloud model for tree / vegetation segmentation from LiDAR .las files.version 0.0.1, accessed on Dec. 13 2025,
+available at: <https://CRAN.R-project.org/package=FuelDeep3D>
+
+# Disclaimer
+
+**FuelDeep3D package comes with no guarantee, expressed or implied, and
+the authors hold no responsibility for its use or reliability of its
+outputs.**
