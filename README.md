@@ -173,14 +173,11 @@ field, which can be visualized in tools like CloudCompare or QGIS using a class-
 
 # Acknowledgements
 
-We gratefully acknowledge funding from NASA’s ICESat-2 (ICESat-2, grant
-22-ICESat2_22-0006), Carbon Monitoring System (CMS, grant 22-CMS22-0015)
-and Commercial Smallsat Data Scientific Analysis(CSDSA, grant
-22-CSDSA22_2-0080).
+We gratefully acknowledge ------------
 
 # Reporting Issues
 
-Please report any issue regarding the ICESat2VegR package to Venkata Siva Reddy Naga(<vs.naga@ufl.edu>)  or Dr. Silva
+Please report any issue regarding the ICESat2VegR package to Venkata Siva Reddy Naga (<vs.naga@ufl.edu>)  or Dr. Silva
 (<c.silva@ufl.edu>).
 # Citing ICESat2VegR
 
