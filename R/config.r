@@ -20,7 +20,25 @@ config <- function(
     weight_decay  = 1e-4,
     cell_size     = 0.25,   # HAG grid size (m)
     quantile      = 0.05,
+    num_classes  = 3,        # <--- NEW: default is 3
+    
+    # NEW: CSF parameters stored inside cfg
+    csf_args = list(
+      rigidness = 2,
+      cloth_resolution = 0.5,
+      time_step = 0.65,
+      class_threshold = 0.2
+    ),
     
     delete_tiles_after_train = TRUE   # <--- turn on deletion
     
-) { as.list(environment()) }
+)  {
+  
+  if (!num_classes %in% c(3, 4)) {
+    stop("num_classes must be 3 or 4.
+          3 = normal model prediction
+          4 = model prediction + CSF-based ground class")
+  }
+  
+  as.list(environment())
+}

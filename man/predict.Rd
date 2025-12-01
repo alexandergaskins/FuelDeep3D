@@ -2,9 +2,15 @@
 % Please edit documentation in R/predict.r
 \name{predict}
 \alias{predict}
-\title{Run prediction on cfg$las_path and write output LAS}
+\title{Run prediction on cfg$las_path and write output LAS
+If cfg$num_classes == 4, add ground using CSF automatically.}
 \usage{
-predict(cfg, mode = c("overwrite", "extra"), setup_env = FALSE)
+predict(
+  cfg,
+  mode = c("overwrite", "extra"),
+  setup_env = FALSE,
+  csf_args = list()
+)
 }
 \arguments{
 \item{cfg}{list from config()}
@@ -12,10 +18,13 @@ predict(cfg, mode = c("overwrite", "extra"), setup_env = FALSE)
 \item{mode}{"overwrite" or "extra"}
 
 \item{setup_env}{logical; FALSE if you already have Python env}
+
+\item{csf_args}{list passed to add_ground_csf() if num_classes == 4}
 }
 \value{
-output LAS path (character)
+path to output LAS
 }
 \description{
 Run prediction on cfg$las_path and write output LAS
+If cfg$num_classes == 4, add ground using CSF automatically.
 }

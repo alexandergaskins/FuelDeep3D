@@ -111,9 +111,9 @@ library(reticulate)
 use_condaenv("pointnext", required = TRUE)
 
 cfg <- config(
-  las_path     = "data/trees2.las",  # any LAS you want to segment
-  out_pred_dir = "data/output_predictions",
-  model_path   = "data/model/best_model.pth"       # your pre-trained checkpoint
+  las_path     = "extdata/las/trees.laz",  # any LAS you want to segment
+  out_pred_dir = "output_predictions",
+  model_path   = "extdata/model/best_model.pth"       # your pre-trained checkpoint
 )
 
 predict(cfg, mode = "overwrite", setup_env = FALSE)

@@ -24,6 +24,7 @@ config(
   weight_decay = 1e-04,
   cell_size = 0.25,
   quantile = 0.05,
+  num_classes = 3,
   delete_tiles_after_train = TRUE
 )
 }

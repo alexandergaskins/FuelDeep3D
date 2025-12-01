@@ -2,18 +2,28 @@
 % Please edit documentation in R/py_deps.R
 \name{install_py_deps}
 \alias{install_py_deps}
-\title{Install Python dependencies into a conda environment}
+\title{Install Python dependencies into a Conda environment}
 \usage{
-install_py_deps(envname = "pointnext")
+install_py_deps(envname = "pointnext", only_if_missing = TRUE)
 }
 \arguments{
-\item{envname}{Name of the conda environment (default: "pointnext").
-The environment must already exist (e.g., created with \code{conda_create()}).}
+\item{envname}{Name of the Conda environment (default: \code{"pointnext"}).
+The environment must already exist (e.g. created with \code{conda_create()}
+or via \code{ensure_py_env()}).}
+
+\item{only_if_missing}{Logical; if \code{TRUE} (default), it will skip
+installation when all key modules are already present.}
 }
 \value{
-Invisibly returns TRUE on success.
+Invisibly returns \code{TRUE} if installation was run, or \code{FALSE}
+if it was skipped because everything was already present.
 }
 \description{
 This helper uses \code{reticulate::conda_install()} with pip to install
-all Python packages needed by FuelDeep3D into a given conda env.
+all Python packages needed by FuelDeep3D into a given Conda env.
+}
+\details{
+If \code{only_if_missing = TRUE}, it first checks for a few key modules
+(\code{torch}, \code{numpy}, \code{sklearn}, \code{laspy}, \code{tqdm}). If all of these are
+importable, it skips installation.
 }
