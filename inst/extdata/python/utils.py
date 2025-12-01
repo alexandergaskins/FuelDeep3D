@@ -33,14 +33,14 @@ def read_las_any(path: str):
     """
     path = str(path)
     if not os.path.exists(path):
-        raise FileNotFoundError(f"[vegseg] LAS/LAZ file not found: {path}")
+        raise FileNotFoundError(f"[FuelDeep3D] LAS/LAZ file not found: {path}")
 
     ext = os.path.splitext(path)[1].lower()
     if ext not in (".las", ".laz"):
-        print(f"[vegseg] Warning: extension '{ext}' is not '.las' or '.laz'; "
+        print(f"[FuelDeep3D] Warning: extension '{ext}' is not '.las' or '.laz'; "
               f"trying to read anyway.")
 
-    print(f"[vegseg] Reading point cloud from {path} ...")
+    print(f"[FuelDeep3D] Reading point cloud from {path} ...")
     return laspy.read(path)
 
 def estimate_ground_z(xyz: np.ndarray, cell: float = 0.25, quantile: float = 0.05):

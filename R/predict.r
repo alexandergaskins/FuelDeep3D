@@ -54,19 +54,21 @@ predict <- function(cfg, mode = c("overwrite", "extra"), setup_env = FALSE) {
     DEVICE          = device
   )
 
-  # decide output path
+  # decide output directory (where predicted LAS/LAZ will be written)
   out_dir <- cfg$out_pred_dir
   if (is.null(out_dir) || !nzchar(out_dir)) out_dir <- "data/output_predictions"
   if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
-  out_las <- file.path(out_dir, "trees_predicted.las")
-
-  message(">> Writing predictions to: ", out_las, " (mode=", mode, ")")
-  py_infer$write_predictions_to_las(
+  
+  message(">> Writing predictions to directory: ", out_dir, " (mode=", mode, ")")
+  out_las <- py_infer$write_predictions_to_las(
     in_las  = cfg$las_path,
-    out_las = out_las,
+    out_dir = out_dir,   # note: pass directory, Python builds filename
     y_pred  = y_pred,
     mode    = mode
   )
-
+  
   invisible(out_las)
 }
+
+
+

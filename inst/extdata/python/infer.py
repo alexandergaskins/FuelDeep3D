@@ -12,7 +12,7 @@ __all__ = ["infer_on_las_path", "write_predictions_to_las"]
 @torch.no_grad()
 def infer_on_las_path(
     model,
-    las_path: str,
+    las_path,
     *,
     BLOCK_SIZE,
     STRIDE,
@@ -35,8 +35,8 @@ def infer_on_las_path(
     CELL_SIZE       = float(CELL_SIZE)
     QUANTILE        = float(QUANTILE)
 
-    print(f"Reading LAS from {las_path} ...")
-    las = read_las_any(LAS_PATH)
+    print(f"Reading file from {las_path} ...")
+    las = read_las_any(las_path)
     xyz = np.c_[las.x, las.y, las.z].astype(np.float32)
     N   = xyz.shape[0]
 
