@@ -17,6 +17,9 @@ add_ground_csf <- function(in_las,
   las <- lidR::readLAS(in_las)
   if (lidR::is.empty(las)) stop("Input LAS is empty: ", in_las)
   
+  # NEW — normalize heights before CSF
+  las <- lidR::normalize_height(las, lidR::knnidw())
+  
   # Save network predictions (0,1,2)
   orig_class <- las$Classification
   

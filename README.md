@@ -111,9 +111,10 @@ library(reticulate)
 use_condaenv("pointnext", required = TRUE)
 
 cfg <- config(
-  las_path     = "extdata/las/trees.laz",  # any LAS or LAZ you want to segment
+  las_path     = system.file("extdata", "las", "trees.laz", package = "FuelDeep3D"),  # any LAS or LAZ you want to segment
   out_pred_dir = "output_predictions",
-  model_path   = "extdata/model/best_model.pth"       # your pre-trained checkpoint
+  model_path   = system.file("extdata", "model", "best_model.pth", package = "FuelDeep3D"),       # your pre-trained checkpoint
+  num_classes = 4
 )
 
 predict(cfg, mode = "overwrite", setup_env = FALSE)
@@ -153,7 +154,7 @@ Each point is colored by its predicted class (e.g., ground/understory, stem, can
 ![Example segmentation output](readme/trees.png)
 
 <p align="center">
-  <img src="readme/trees1.png" alt="Single tree segmentation output" width="45%">
+  <img src="readme/tree.gif" alt="Single tree segmentation output" width="45%">
 </p>
 
 

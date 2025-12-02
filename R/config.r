@@ -24,10 +24,10 @@ config <- function(
     
     # NEW: CSF parameters stored inside cfg
     csf_args = list(
-      rigidness = 2,
-      cloth_resolution = 0.5,
-      time_step = 0.65,
-      class_threshold = 0.2
+      rigidness = 4,                   # stiffness of the cloth (2 = balanced, stable ground detection)
+      cloth_resolution = 0.25,        # grid size of cloth in meters (0.5 = good detail for forests)
+      time_step = 0.65,               # simulation step size (controls cloth drop speed/stability)
+      class_threshold = 0.05          # max distance from cloth to classify a point as ground
     ),
     
     delete_tiles_after_train = TRUE   # <--- turn on deletion
