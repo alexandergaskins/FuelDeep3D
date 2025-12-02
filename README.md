@@ -168,9 +168,10 @@ We gratefully acknowledge ------------
 
 # Reporting Issues
 
-Please report any issue regarding the ICESat2VegR package to Venkata Siva Reddy Naga (<vs.naga@ufl.edu>)  or Dr. Silva
+Please report any issue regarding the FuelDeep3D package to Venkata Siva Reddy Naga (<vs.naga@ufl.edu>)  or Dr. Silva
 (<c.silva@ufl.edu>).
-# Citing ICESat2VegR
+
+# Citing FuelDeep3D
 
 Venkata Siva Naga; Silva,C.A. FuelDeep3D: An R R wrapper around a PyTorch point-cloud model for tree / vegetation segmentation from LiDAR .las files.version 0.0.1, accessed on Dec. 13 2025,
 available at: <https://CRAN.R-project.org/package=FuelDeep3D>
