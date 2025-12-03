@@ -46,7 +46,7 @@ The Python side (in `src/`) handles:
 ```r
 install.packages(
   "FuelDeep3D",
-  repos = c("https://venkatasivanaga.r-universe.dev",
+  repos = c("https://venkatasivanaga.r-universe.dev/FuelDeep3D",
             "https://cloud.r-project.org")
 )
 
