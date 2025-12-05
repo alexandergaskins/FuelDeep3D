@@ -5,3 +5,7 @@
 .DS_Store
 inst/extdata/python/__pycache__/
 inst/extdata/python/.venv/
+output_predictions/
+test/
+train/
+val/

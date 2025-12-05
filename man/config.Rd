@@ -25,6 +25,8 @@ config(
   cell_size = 0.25,
   quantile = 0.05,
   num_classes = 3,
+  csf_args = list(rigidness = 4, cloth_resolution = 0.25, time_step = 0.65,
+    class_threshold = 0.05),
   delete_tiles_after_train = TRUE
 )
 }

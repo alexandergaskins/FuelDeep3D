@@ -131,10 +131,10 @@ library(reticulate)
 use_condaenv("pointnext", required = TRUE)
 
 cfg <- config(
-  las_path     = "data/trees.las",
-  out_dir      = "data/ds_hag4",
-  out_pred_dir = "data/output_predictions",
-  model_path   = "data/model/best_model.pth",
+  las_path     = system.file("extdata", "las", "trees.laz", package = "FuelDeep3D"),
+  out_dir      = system.file("extdata", "npz_files", package = "FuelDeep3D"),
+  out_pred_dir = system.file("extdata", "output_directory", package = "FuelDeep3D"),
+  model_path   = system.file("extdata", "model", "best_model.pth", package = "FuelDeep3D"),
   epochs       = 2, batch_size = 16,
   learning_rate = 1e-5, weight_decay = 1e-4,
   block_size = 6, stride = 1, sample_n = 4096,
