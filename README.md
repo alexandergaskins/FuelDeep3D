@@ -113,6 +113,9 @@ This section provides simple commands to visualize `.las` / `.laz` files during 
 
 ### 2.1 Visualize Raw LiDAR by Height (Z)
 
+This visualization shows the raw, unclassified LiDAR point cloud, where points are colored solely based on their height (Z value).
+This height-based coloring helps reveal canopy layers, trunk structure, and ground elevation differences.
+
 ```r
 library(lidR)
 
@@ -149,24 +152,6 @@ las_pred <- readLAS("output_predictions/trees_predicted.las")
 # Color by predicted vegetation class
 plot(las_pred, color = "Classification")
 ```
-
-
-Different colors represent distinct vegetation components such as ground, stem, understory, and foliage.
-
----
-
-### 2.4 Example Full-Scene Segmentation Output
-
-Below is an example showing the outcome of applying FuelDeep3D to a forest plot:
-
-<p align="center">
-  <img src="readme/trees.png" width="90%">
-</p>
-
-The predicted `Classification` values allow direct visualization of vegetation structure in tools like
-CloudCompare, QGIS, or using R itself.
-
----
 
 
 ## 3. Predict on a new LAS using a pre-trained model
@@ -227,6 +212,9 @@ you can compute accuracy, confusion matrix, precision, recall, and F1 directly.
 ---
 
 ### 5.1 Evaluate a LAS File
+
+This function allows users to evaluate segmentation performance directly from a single LAS file that contains both ground-truth labels and predicted classes.
+Simply specify which attribute stores the true labels (e.g., "label") and which stores the predictions (e.g., "Classification"), and the function computes accuracy, confusion matrix, precision, recall, and F1 scores automatically.
 
 ```r
 library(FuelDeep3D)
