@@ -274,12 +274,14 @@ print_metrics_table(results)
 This produces an easy-to-read table:
 
 ```
-| Class   | Precision | Recall | F1_Score |
-|---------|-----------|--------|----------|
-| 0       | 0.9508    | 0.9535 | 0.9521   |
-| 1       | 0.8940    | 0.9450 | 0.9188   |
-| 2       | 0.7375    | 0.6552 | 0.6941   |
-| Overall | 0.8608    | 0.8512 | 0.8550   |
+| Class   | Precision | Recall | F1_Score | Accuracy |
+|---------|-----------|--------|----------|----------|
+| 0       | 0.9508    | 0.9535 | 0.9521   | 0.9535   |
+| 1       | 0.8940    | 0.9450 | 0.9188   | 0.9450   |
+| 2       | 0.7375    | 0.6552 | 0.6941   | 0.7552   | 
+| Overall | 0.8608    | 0.8512 | 0.8550   | 0.9012   |
+|---------|-----------|--------|----------|----------|
+
 ```
 
 Where the **Overall** row reports macro-averaged precision, recall, and F1 across all classes.
