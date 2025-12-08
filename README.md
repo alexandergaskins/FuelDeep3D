@@ -150,28 +150,8 @@ las_pred <- readLAS("output_predictions/trees_predicted.las")
 plot(las_pred, color = "Classification")
 ```
 
-<p align="center">
-  <img src="readme/class_visualization.png" alt="Predicted segmentation" width="85%">
-</p>
 
 Different colors represent distinct vegetation components such as ground, stem, understory, and foliage.
-
----
-
-### 2.3 Visualizing a Single-Tree Segment
-
-If your pipeline extracts or predicts individual trees, you can visualize a single tree easily:
-
-```r
-single_tree <- readLAS(system.file("extdata", "las", "single_tree.laz",
-                                   package = "FuelDeep3D"))
-
-plot(single_tree, color = "Z")
-```
-
-<p align="center">
-  <img src="readme/tree.gif" alt="Single tree segmentation output" width="45%">
-</p>
 
 ---
 
