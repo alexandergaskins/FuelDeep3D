@@ -101,6 +101,92 @@ ensure_py_env("pointnext")   # creates env + installs deps the first time
 py_config()
 
 ```
+---
+
+## 2. Visualization
+
+`FuelDeep3D` integrates smoothly with the **lidR** package, enabling users to quickly explore
+raw LiDAR scenes, height structures, and model-predicted segmentations.  
+This section provides simple commands to visualize `.las` / `.laz` files during your workflow.
+
+---
+
+### 2.1 Visualize Raw LiDAR by Height (Z)
+
+```r
+library(lidR)
+
+las <- readLAS(system.file("extdata", "las", "trees.laz",
+                           package = "FuelDeep3D"))
+
+# Visualize by elevation
+plot(las, color = "Z", colorPalette = height.colors(50))
+```
+
+<p align="center">
+  <img src="readme/raw.png" alt="Raw LiDAR visualization" width="85%">
+</p>
+
+This view helps inspect canopy structure, terrain variation, and overall point-cloud quality.
+
+---
+
+### 2.2 Visualize Model Predictions (Classification Field)
+
+After running prediction:
+
+```r
+predict(cfg, mode = "overwrite")
+```
+
+The predicted labels are written into the `Classification` field of the output LAS file.
+
+You can visualize them in R:
+
+```r
+las_pred <- readLAS("output_predictions/trees_predicted.las")
+
+# Color by predicted vegetation class
+plot(las_pred, color = "Classification")
+```
+
+<p align="center">
+  <img src="readme/class_visualization.png" alt="Predicted segmentation" width="85%">
+</p>
+
+Different colors represent distinct vegetation components such as ground, stem, understory, and foliage.
+
+---
+
+### 2.3 Visualizing a Single-Tree Segment
+
+If your pipeline extracts or predicts individual trees, you can visualize a single tree easily:
+
+```r
+single_tree <- readLAS(system.file("extdata", "las", "single_tree.laz",
+                                   package = "FuelDeep3D"))
+
+plot(single_tree, color = "Z")
+```
+
+<p align="center">
+  <img src="readme/tree.gif" alt="Single tree segmentation output" width="45%">
+</p>
+
+---
+
+### 2.4 Example Full-Scene Segmentation Output
+
+Below is an example showing the outcome of applying FuelDeep3D to a forest plot:
+
+<p align="center">
+  <img src="readme/trees.png" width="90%">
+</p>
+
+The predicted `Classification` values allow direct visualization of vegetation structure in tools like
+CloudCompare, QGIS, or using R itself.
+
+---
 
 
 ## 3. Predict on a new LAS using a pre-trained model
