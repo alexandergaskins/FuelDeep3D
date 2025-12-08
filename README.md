@@ -30,7 +30,7 @@ The R side handles:
 - calling Python training / inference  
 - writing predicted classes back to LAS
 
-The Python side (in `src/`) handles:
+The Python side (in `inst/extdata`) handles:
 
 - dataset tiling and feature building (XYZ + HAG)  
 - training a height-aware point model  
