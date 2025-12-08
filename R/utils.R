@@ -41,44 +41,99 @@ plot_las_3d <- function(las, palette = palette_veg(), size = 2, title = "LAS 3D 
   )
 }
 
-# ------------------------------------------------------------
-# Confusion Matrix + Evaluation Metrics
-# ------------------------------------------------------------
-#' Evaluate Predicted vs True LAS Labels
+
+# ============================================================
+# Confusion Matrix + Evaluation Metrics (Improved)
+# ============================================================
+
+#' Evaluate LAS Using Custom Field Names
 #'
-#' @param pred LAS with predicted Classification
-#' @param truth LAS with true labels (column "label")
+#' Computes confusion matrix, accuracy, per-class precision, recall, and F1 scores.
 #'
-#' @return list of confusion matrix, accuracy, precision, recall, F1
+#' @param las LAS object containing both truth and prediction fields
+#' @param truth_col Name of the ground-truth label field (default = "label")
+#' @param pred_col  Name of the predicted label field (default = "Classification")
+#'
+#' @return list with confusion matrix, accuracy, precision, recall, F1
 #' @export
-evaluate_las <- function(pred, truth) {
-  stopifnot(nrow(pred@data) == nrow(truth@data))
+evaluate_single_las <- function(las, truth_col = "label", pred_col = "Classification") {
+  stopifnot("LAS" %in% class(las))
   
-  pred_labels  <- as.integer(pred$Classification)
-  true_labels  <- as.integer(truth$label)
+  # Check fields
+  if (!(truth_col %in% names(las@data)))
+    stop(paste("Truth column", truth_col, "not found in LAS."))
   
+  if (!(pred_col %in% names(las@data)))
+    stop(paste("Prediction column", pred_col, "not found in LAS."))
+  
+  true_labels <- as.integer(las@data[[truth_col]])
+  pred_labels <- as.integer(las@data[[pred_col]])
+  
+  # Confusion matrix
   cm <- table(True = true_labels, Pred = pred_labels)
   
   # Metrics
-  accuracy <- sum(diag(cm)) / sum(cm)
+  accuracy  <- sum(diag(cm)) / sum(cm)
   precision <- diag(cm) / colSums(cm)
   recall    <- diag(cm) / rowSums(cm)
   f1        <- 2 * precision * recall / (precision + recall)
   
   list(
     confusion = cm,
-    accuracy = accuracy,
+    accuracy  = accuracy,
     precision = precision,
-    recall = recall,
-    f1 = f1
+    recall    = recall,
+    f1        = f1
   )
 }
 
 # ------------------------------------------------------------
-# Quick class distribution summary
+# Print confusion matrix in aligned table form
 # ------------------------------------------------------------
-#' Class Count Summary
+#' Pretty-print confusion matrix
+#'
+#' @param cm Confusion matrix (table)
 #' @export
-class_summary <- function(las) {
-  table(las$Classification)
+print_confusion_matrix <- function(cm) {
+  df <- as.data.frame.matrix(cm)
+  print(df)
+}
+
+
+# ------------------------------------------------------------
+# Print per-class Precision / Recall / F1 in a table + summary row
+# ------------------------------------------------------------
+#' Pretty-print evaluation metrics table with summary row
+#'
+#' @param results List returned by evaluate_single_las()
+#' @export
+print_metrics_table <- function(results) {
+  
+  precision <- results$precision
+  recall    <- results$recall
+  f1        <- results$f1
+  
+  classes <- names(precision)
+  
+  # Per-class metrics table
+  df <- data.frame(
+    Class     = classes,
+    Precision = round(precision, 4),
+    Recall    = round(recall, 4),
+    F1_Score  = round(f1, 4)
+  )
+  
+  # Add summary row ("All" classes)
+  df <- rbind(
+    df,
+    data.frame(
+      Class     = "Overall",
+      Precision = round(mean(precision, na.rm = TRUE), 4),
+      Recall    = round(mean(recall, na.rm = TRUE), 4),
+      F1_Score  = round(mean(f1, na.rm = TRUE), 4)
+    )
+  )
+  
+  rownames(df) <- NULL
+  print(df)
 }

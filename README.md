@@ -212,7 +212,99 @@ res <- train(cfg, setup_env = FALSE)        # trains & saves best .pth
 predict(cfg, mode = "overwrite", setup_env = FALSE)  # writes trees_predicted.las
 ```
 
-## 5 Predicted results
+---
+
+## 5. Evaluation of Predicted LAS Files
+
+`FuelDeep3D` provides built-in utilities to evaluate model predictions stored inside a LAS/LAZ
+file. If your file contains both:
+
+- **Ground truth labels** (e.g., column `"label"`)
+- **Predicted classes** (e.g., column `"Classification"`)
+
+you can compute accuracy, confusion matrix, precision, recall, and F1 directly.
+
+---
+
+### 5.1 Evaluate a LAS File
+
+```r
+library(FuelDeep3D)
+library(lidR)
+
+# Load LAS containing both GT + predictions
+las <- readLAS("trees_predicted.las")
+
+# Run evaluation
+results <- evaluate_single_las(
+  las,
+  truth_col = "label",
+  pred_col  = "Classification"
+)
+```
+
+This returns a list with:
+
+- `confusion` – confusion matrix  
+- `accuracy` – overall accuracy  
+- `precision` – per-class precision  
+- `recall` – per-class recall  
+- `f1` – per-class F1 scores  
+
+---
+
+### 5.2 Print Confusion Matrix
+
+```r
+print_confusion_matrix(results$confusion)
+```
+
+This prints a clean, aligned table such as:
+
+```
+        0       1       2
+0  528404    1005    3253
+1   25457 2598520  140186
+2   24931   449195  867824
+```
+
+---
+
+### 5.3 Print Precision, Recall, and F1 in a Table
+
+```r
+print_metrics_table(results)
+```
+
+This produces an easy-to-read table:
+
+```
+  Class Precision Recall F1_Score
+1     0    0.9508 0.9535   0.9521
+2     1    0.8940 0.9450   0.9188
+3     2    0.7375 0.6552   0.6941
+4 Overall 0.8608 0.8512   0.8550
+```
+
+Where the **Overall** row reports macro-averaged precision, recall, and F1 across all classes.
+
+---
+
+### 5.4 Class Distribution Summary
+
+```r
+class_summary(las)
+```
+
+Shows how many points belong to each predicted class.
+
+---
+
+These tools make it simple to evaluate segmentation performance directly from a LAS file without requiring external scripts or reformatting.
+
+---
+
+### 5.5 Predicted Result
 
 The figure below shows an example of the vegetation segmentation applied to a labeled LAS file.
 Each point is colored by its predicted class (e.g., ground/understory, stem, canopy foliage).
@@ -227,6 +319,8 @@ Each point is colored by its predicted class (e.g., ground/understory, stem, can
 In this example, the model was trained on `trees.las` and then used to predict labels for the
 same scene. The output LAS (`trees_predicted.las`) stores predictions in the `classification`
 field, which can be visualized in tools like CloudCompare or QGIS using a class-based color ramp.
+
+---
 
 # Acknowledgements
 
