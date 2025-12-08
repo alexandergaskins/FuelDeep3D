@@ -9,32 +9,27 @@ badge](https://venkatasivanaga.dev/badges/FuelDeep3D)](https://venkatasivanaga.r
 ![licence](https://img.shields.io/badge/Licence-GPL--3-blue.svg)
 ![Downloads](https://cranlogs.r-pkg.org/badges/grand-total/FuelDeep3D)
 
-# FuelDeep3D: Tree Segmentation with LiDAR + PyTorch (R + Python)
+# FuelDeep3D: An R package for Fire Fuels Segmentation in 3D Using Terrestrial Laser Scanning and Deep Learning  
 
 **Authors:** Venkata Siva Reddy Naga, Carlos Alberto Silva, et al.,
 
 
-`FuelDeep3D` is an R wrapper around a PyTorch point-cloud model for **tree / vegetation segmentation** from LiDAR `.las` files.  
+`FuelDeep3D` provides tools for processing, feature extraction, and classification of 3D forest point clouds for fuel assessment applications. 
+The package supports creating training datasets, computing height-derived metrics, segmenting vegetation structures, and writing per-point fuel 
+classes back to LAS/LAZ files. These functions streamline TLS-based fuel mapping workflows and enable integration with forest inventory, 
+wildfire modeling, and ecological analysis pipelines in R.  
 
-It provides a clean R interface:
+The package enables users to move efficiently from raw .las files to classified fuel layers, supporting applications in forest structure assessment, wildfire behavior modeling, and fuel complexity analysis.
 
-- Build a training dataset from a labeled `.las`
-- Train a height-aware Pointnext model in Python (via **reticulate**)
-- Run inference on new `.las` files and write predictions back to LAS
-- Keep everything orchestrated from R, so it can be used inside R scripts, notebooks, or RStudio.
+FuelDeep3D offers tools to:
 
+-Build structured training datasets from labeled point clouds
+-Compute height-derived features such as height-above-ground (HAG)
+-Tile, sample, and preprocess large TLS scenes for efficient modeling
+-Apply trained models to new .las files and write predictions back to disk
+-Enable users to train their own deep learning models on custom labeled datasets
+-Perform visualization, quality control, and evaluation of predicted fuel classes
 
-The R side handles:
-
-- configuration and paths  
-- calling Python training / inference  
-- writing predicted classes back to LAS
-
-The Python side (in `inst/extdata`) handles:
-
-- dataset tiling and feature building (XYZ + HAG)  
-- training a height-aware point model  
-- full-scene inference and LAS writing
 
 ---
 
@@ -154,7 +149,19 @@ plot(las_pred, color = "Classification")
 ```
 
 
-## 3. Predict on a new LAS using a pre-trained model
+## 3. Pre-processing
+
+Pre-processing inlcudes ......
+
+```r
+las_pred <- readLAS("output_predictions/trees_predicted.las")
+
+# Color by predicted vegetation class
+plot(las_pred, color = "Classification")
+```
+
+
+## 4.Predict on a new LAS using a pre-trained model
 
 ```r
 library(FuelDeep3D)
@@ -165,7 +172,7 @@ cfg <- config(
   las_path     = system.file("extdata", "las", "trees.laz", package = "FuelDeep3D"),  # any LAS or LAZ you want to segment
   out_pred_dir = "output_predictions",
   model_path   = system.file("extdata", "model", "best_model.pth", package = "FuelDeep3D"),       # your pre-trained checkpoint
-  num_classes = 4
+  num_classes = 3
 )
 
 predict(cfg, mode = "overwrite", setup_env = FALSE)
@@ -267,11 +274,12 @@ print_metrics_table(results)
 This produces an easy-to-read table:
 
 ```
-  Class Precision Recall F1_Score
-1     0    0.9508 0.9535   0.9521
-2     1    0.8940 0.9450   0.9188
-3     2    0.7375 0.6552   0.6941
-4 Overall 0.8608 0.8512   0.8550
+| Class   | Precision | Recall | F1_Score |
+|---------|-----------|--------|----------|
+| 0       | 0.9508    | 0.9535 | 0.9521   |
+| 1       | 0.8940    | 0.9450 | 0.9188   |
+| 2       | 0.7375    | 0.6552 | 0.6941   |
+| Overall | 0.8608    | 0.8512 | 0.8550   |
 ```
 
 Where the **Overall** row reports macro-averaged precision, recall, and F1 across all classes.

@@ -2,7 +2,8 @@
 % Please edit documentation in R/config.r
 \name{config}
 \alias{config}
-\title{Default config}
+\title{Default config
+Create model configuration}
 \usage{
 config(
   las_path = system.file("extdata", "trees.las", package = "FuelDeep3D"),
@@ -30,6 +31,55 @@ config(
   delete_tiles_after_train = TRUE
 )
 }
+\arguments{
+\item{las_path}{Path to input LAS file}
+
+\item{out_dir}{Directory where training tiles are saved}
+
+\item{out_pred_dir}{Directory where predictions are written}
+
+\item{model_path}{Path to pre-trained .pth model}
+
+\item{device}{Device to use ("cpu" or "cuda")}
+
+\item{block_size}{Tile size in meters}
+
+\item{stride}{Overlap stride}
+
+\item{sample_n}{Number of points sampled per tile}
+
+\item{repeat_per_tile}{Number of augmentations per tile}
+
+\item{min_pts_tile}{Minimum number of points to keep a tile}
+
+\item{val_split}{Fraction for validation split}
+
+\item{test_split}{Fraction for test split}
+
+\item{seed}{Random seed}
+
+\item{batch_size}{Batch size for training}
+
+\item{epochs}{Number of training epochs}
+
+\item{learning_rate}{Optimizer learning rate}
+
+\item{weight_decay}{L2 regularization strength}
+
+\item{cell_size}{Grid cell size for height normalization}
+
+\item{quantile}{Quantile threshold used in metrics}
+
+\item{num_classes}{Number of segmentation classes}
+
+\item{csf_args}{Additional arguments passed to RCSF::csf()}
+
+\item{delete_tiles_after_train}{Whether to delete generated tiles after training}
+}
+\value{
+A list containing all configuration parameters
+}
 \description{
 Default config
+Create model configuration
 }

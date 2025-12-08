@@ -2,6 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
+.RDataTmp
 .DS_Store
 inst/extdata/python/__pycache__/
 inst/extdata/python/.venv/
