@@ -203,118 +203,151 @@ predict(cfg, mode = "overwrite", setup_env = FALSE)  # writes trees_predicted.la
 
 ## 5. Evaluation of Predicted LAS Files
 
-`FuelDeep3D` provides built-in utilities to evaluate model predictions stored inside a LAS/LAZ
-file. If your file contains both:
 
-- **Ground truth labels** (e.g., column `"label"`)
-- **Predicted classes** (e.g., column `"Classification"`)
+
 
 you can compute accuracy, confusion matrix, precision, recall, and F1 directly.
 
----
 
-### 5.1 Evaluate a LAS File
 
-This function allows users to evaluate segmentation performance directly from a single LAS file that contains both ground-truth labels and predicted classes.
-Simply specify which attribute stores the true labels (e.g., "label") and which stores the predictions (e.g., "Classification"), and the function computes accuracy, confusion matrix, precision, recall, and F1 scores automatically.
 
-```r
-library(FuelDeep3D)
-library(lidR)
 
-# Load LAS containing both GT + predictions
-las <- readLAS("trees_predicted.las")
 
-# Run evaluation
-results <- evaluate_single_las(
-  las,
-  truth_col = "label",
-  pred_col  = "Classification"
-)
-```
+FuelDeep3D includes evaluation utilities to measure segmentation quality using LAS/LAZ files. These tools compute:
 
-This returns a list with:
-
-- `confusion` – confusion matrix  
-- `accuracy` – overall accuracy  
-- `precision` – per-class precision  
-- `recall` – per-class recall  
-- `f1` – per-class F1 scores  
+- Overall accuracy  
+- Confusion matrix  
+- Per-class precision, recall, and F1-score  
 
 ---
 
-### 5.1.1 Visualize Model Predictions (Classification Field)
+  ### 5.1.1 Evaluate a Single LAS File
 
-After running prediction:
+  This function allows users to evaluate segmentation performance directly from a single LAS file that contains both ground-truth labels and predicted classes.
+  Simply specify which attribute stores the true labels (e.g., "label") and which stores the predictions (e.g., "Classification"), and the function computes accuracy, confusion matrix, precision, recall, and F1 scores automatically.
 
-```r
-predict(cfg, mode = "overwrite")
-```
+  Use this when **ground truth and predictions are in the same LAS file**, stored in two different fields.
 
-The predicted labels are written into the `Classification` field of the output LAS file.
+  - **Ground truth labels** (e.g., column `"label"`)
+  - **Predicted classes** (e.g., column `"Classification"`)
 
-You can visualize them in R:
+  ```r
+  library(FuelDeep3D)
+  library(lidR)
 
-```r
-las_pred <- readLAS("output_predictions/trees_predicted.las")
+  # LAS contains both GT (label) and predictions (Classification)
+  las <- readLAS("trees_predicted.las")
 
-# Color by predicted vegetation class
-plot(las_pred, color = "Classification")
-```
+  results <- evaluate_single_las(
+    las,
+    truth_col = "label",
+    pred_col  = "Classification"
+  )
 
-### 5.2 Print Confusion Matrix
+results$accuracy
+results$confusion_matrix
+results$precision
+results$recall
+results$f1
 
-```r
-print_confusion_matrix(results$confusion)
-```
+  ```
 
-This prints a clean, aligned table such as:
 
-```
-| True \ Pred |       0 |       1 |       2 |
-|-------------|---------|---------|---------|
-|    0        | 528404  |    1005 |    3253 |
-|    1        | 25457   | 2598520 | 140186  |
-|    2        | 24931   | 449195  | 867824  |
+  ### 5.1.2 Evaluate Two LAS Files
 
-```
+  Use this when ground truth labels and predicted classes are saved in two separate LAS/LAZ files.
+  Both files must be point-wise aligned (same points in the same order, same number of points).
+  The function compares truth_col vs pred_col and returns accuracy, confusion matrix, and per-class precision/recall/F1.
 
----
 
-### 5.3 Print Precision, Recall, F1 and Accuracy in a Table
+  ```r
+  library(FuelDeep3D)
+  library(lidR)
 
-```r
-print_metrics_table(results)
-```
+  truth_las <- readLAS("trees_groundtruth.las")  # contains truth_col (e.g., label)
+  pred_las  <- readLAS("trees_predicted.las")    # contains pred_col  (e.g., Classification)
 
-This produces an easy-to-read table:
+  results <- evaluate_two_las(
+    truth_las,
+    pred_las,
+    truth_col = "label",
+    pred_col  = "Classification"
+  )
 
-```
-| Class   | Precision | Recall | F1_Score | Accuracy |
-|---------|-----------|--------|----------|----------|
-| 0       | 0.9508    | 0.9535 | 0.9521   | 0.9535   |
-| 1       | 0.8940    | 0.9450 | 0.9188   | 0.9450   |
-| 2       | 0.7375    | 0.6552 | 0.6941   | 0.7552   | 
-| Overall | 0.8608    | 0.8512 | 0.8550   | 0.9012   |
-|---------|-----------|--------|----------|----------|
+results$accuracy
+results$confusion_matrix
+results$precision
+results$recall
+results$f1
 
-```
+  ```
 
-Where the **Overall** row reports macro-averaged precision, recall, and F1 across all classes.
+  ---
 
----
+  This helpt to return a list with:
 
-### 5.4 Class Distribution Summary
+  - `confusion` – confusion matrix  
+  - `accuracy` – overall accuracy  
+  - `precision` – per-class precision  
+  - `recall` – per-class recall  
+  - `f1` – per-class F1 scores  
 
-```r
-class_summary(las)
-```
+  ---
 
-Shows how many points belong to each predicted class.
 
----
+  ### 5.2 Print Confusion Matrix
 
-These tools make it simple to evaluate segmentation performance directly from a LAS file without requiring external scripts or reformatting.
+  ```r
+  print_confusion_matrix(results$confusion)
+  ```
+
+  This prints a clean, aligned table such as:
+
+  ```
+  | True \ Pred |       0 |       1 |       2 |
+  |-------------|---------|---------|---------|
+  |    0        | 528404  |    1005 |    3253 |
+  |    1        | 25457   | 2598520 | 140186  |
+  |    2        | 24931   | 449195  | 867824  |
+
+  ```
+
+  ---
+
+  ### 5.3 Print Precision, Recall, F1 and Accuracy in a Table
+
+  ```r
+  print_metrics_table(results)
+  ```
+
+  This produces an easy-to-read table:
+
+  ```
+  | Class   | Precision | Recall | F1_Score | Accuracy |
+  |---------|-----------|--------|----------|----------|
+  | 0       | 0.9508    | 0.9535 | 0.9521   | 0.9535   |
+  | 1       | 0.8940    | 0.9450 | 0.9188   | 0.9450   |
+  | 2       | 0.7375    | 0.6552 | 0.6941   | 0.7552   | 
+  | Overall | 0.8608    | 0.8512 | 0.8550   | 0.9012   |
+  |---------|-----------|--------|----------|----------|
+
+  ```
+
+  Where the **Overall** row reports macro-averaged precision, recall, and F1 across all classes.
+
+  ---
+
+  ### 5.4 Class Distribution Summary
+
+  ```r
+  class_summary(las)
+  ```
+
+  Shows how many points belong to each predicted class.
+
+  ---
+
+  These tools make it simple to evaluate segmentation performance directly from a LAS file without requiring external scripts or reformatting.
 
 ---
 

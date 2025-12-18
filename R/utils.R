@@ -34,13 +34,23 @@ plot_las_3d <- function(las,
                         size = 2,
                         title = "LAS 3D View") {
 
+  if (!requireNamespace("lidR", quietly = TRUE)) {
+    stop("Package 'lidR' is required. Install it with install.packages('lidR').")
+  }
+  if (!requireNamespace("rgl", quietly = TRUE)) {
+    stop("Package 'rgl' is required for 3D plotting. Install it with install.packages('rgl').")
+  }
+
   stopifnot(inherits(las, "LAS"))
 
   rgl::open3d()
   rgl::title3d(title)
 
+  # Prefer standard LAS column names
+  xyz <- las@data[, c("X", "Y", "Z"), drop = FALSE]
+
   rgl::points3d(
-    las@data[, c("X", "Y", "Z")],
+    xyz,
     col  = palette[as.character(las$Classification)],
     size = size
   )
@@ -65,6 +75,7 @@ plot_las_3d <- function(las,
 #'
 #' @examples
 #' \dontrun{
+#' library(lidR)
 #' las <- readLAS("trees.laz")
 #' las_clean <- remove_noise_sor(las, height_thresh = 5, k = 20, zscore = 2.5)
 #' }
@@ -75,56 +86,77 @@ remove_noise_sor <- function(las,
                              k = 20,
                              zscore = 2.5) {
 
-  stopifnot(inherits(las, "LAS"))
-
-  if (lidR::is.empty(las)) {
-    return(las)
+  if (!requireNamespace("lidR", quietly = TRUE)) {
+    stop("Package 'lidR' is required. Install it with install.packages('lidR').")
+  }
+  if (!requireNamespace("dbscan", quietly = TRUE)) {
+    stop("Package 'dbscan' is required. Install it with install.packages('dbscan').")
   }
 
-  if (!is.numeric(height_thresh) || height_thresh < 0)
-    stop("height_thresh must be a non-negative numeric value.")
+  stopifnot(inherits(las, "LAS"))
 
-  if (!is.numeric(k) || k < 1)
-    stop("k must be a positive integer.")
+  if (lidR::is.empty(las)) return(las)
 
-  if (!is.numeric(zscore) || zscore <= 0)
-    stop("zscore must be a positive numeric value.")
+  if (!is.numeric(height_thresh) || length(height_thresh) != 1 || height_thresh < 0)
+    stop("height_thresh must be a single non-negative numeric value.")
+
+  if (!is.numeric(k) || length(k) != 1 || k < 1)
+    stop("k must be a single positive integer.")
+
+  if (!is.numeric(zscore) || length(zscore) != 1 || zscore <= 0)
+    stop("zscore must be a single positive numeric value.")
 
   # Split points
   high_pts <- las[las$Z > height_thresh]
   low_pts  <- las[las$Z <= height_thresh]
 
-  if (lidR::npoints(high_pts) < k) {
-    return(las)
-  }
+  if (lidR::npoints(high_pts) < k) return(las)
 
   # kNN distances
   xyz <- cbind(high_pts$X, high_pts$Y, high_pts$Z)
   knn_dist <- dbscan::kNNdist(xyz, k = k)
-
   d_mean <- rowMeans(knn_dist)
 
   mu <- mean(d_mean)
   sigma <- stats::sd(d_mean)
 
-  if (is.na(sigma) || sigma == 0) {
-    return(las)
-  }
+  if (!is.finite(sigma) || sigma == 0) return(las)
 
   keep <- d_mean < (mu + zscore * sigma)
-
   high_clean <- high_pts[keep]
 
-  rbind(low_pts, high_clean)
+  # Combine back
+  if (exists("rbind_las", where = asNamespace("lidR"), inherits = FALSE)) {
+    lidR::rbind_las(low_pts, high_clean)
+  } else {
+    rbind(low_pts, high_clean)
+  }
 }
 
 # ============================================================
 # Confusion Matrix + Evaluation Metrics
 # ============================================================
 
-#' Evaluate LAS Using Custom Field Names
+# ------------------------------------------------------------
+# Internal helper: compute metrics from confusion matrix
+# ------------------------------------------------------------
+metrics_from_cm <- function(cm) {
+  precision <- diag(cm) / colSums(cm)
+  recall    <- diag(cm) / rowSums(cm)
+  f1        <- 2 * precision * recall / (precision + recall)
+
+  # Replace Inf/NaN due to division by zero
+  precision[!is.finite(precision)] <- NA_real_
+  recall[!is.finite(recall)]       <- NA_real_
+  f1[!is.finite(f1)]               <- NA_real_
+
+  list(precision = precision, recall = recall, f1 = f1)
+}
+
+#' Evaluate a single LAS using custom field names
 #'
-#' Computes confusion matrix, accuracy, per-class precision, recall, and F1 scores.
+#' Computes confusion matrix, accuracy, and per-class precision/recall/F1
+#' from one LAS file that contains both truth and prediction fields.
 #'
 #' @param las LAS object containing both truth and prediction fields
 #' @param truth_col Name of the ground-truth label field (default = "label")
@@ -136,30 +168,92 @@ evaluate_single_las <- function(las,
                                 truth_col = "label",
                                 pred_col  = "Classification") {
 
+  if (!requireNamespace("lidR", quietly = TRUE)) {
+    stop("Package 'lidR' is required. Install it with install.packages('lidR').")
+  }
+
   stopifnot(inherits(las, "LAS"))
 
   if (!(truth_col %in% names(las@data)))
-    stop(paste("Truth column", truth_col, "not found in LAS."))
+    stop(paste("Truth column", shQuote(truth_col), "not found in LAS."))
 
   if (!(pred_col %in% names(las@data)))
-    stop(paste("Prediction column", pred_col, "not found in LAS."))
+    stop(paste("Prediction column", shQuote(pred_col), "not found in LAS."))
 
   true_labels <- as.integer(las@data[[truth_col]])
   pred_labels <- as.integer(las@data[[pred_col]])
 
-  cm <- table(True = true_labels, Pred = pred_labels)
+  if (length(true_labels) != length(pred_labels))
+    stop("Truth and prediction vectors have different lengths.")
 
-  accuracy  <- sum(diag(cm)) / sum(cm)
-  precision <- diag(cm) / colSums(cm)
-  recall    <- diag(cm) / rowSums(cm)
-  f1        <- 2 * precision * recall / (precision + recall)
+  cm <- table(True = true_labels, Pred = pred_labels)
+  acc <- sum(diag(cm)) / sum(cm)
+
+  m <- metrics_from_cm(cm)
+
+  # Return BOTH names so your README can use confusion_matrix
+  list(
+    confusion = cm,
+    confusion_matrix = cm,
+    accuracy  = acc,
+    precision = m$precision,
+    recall    = m$recall,
+    f1        = m$f1
+  )
+}
+
+#' Evaluate two LAS files (truth vs prediction)
+#'
+#' Computes confusion matrix, accuracy, and per-class precision/recall/F1
+#' using two separate LAS/LAZ files that are point-wise aligned.
+#'
+#' @param truth_las LAS containing ground-truth labels
+#' @param pred_las  LAS containing predicted labels
+#' @param truth_col Name of truth label field in truth_las (default = "label")
+#' @param pred_col  Name of prediction field in pred_las (default = "Classification")
+#'
+#' @return list with confusion matrix, accuracy, precision, recall, F1
+#' @export
+evaluate_two_las <- function(truth_las,
+                             pred_las,
+                             truth_col = "label",
+                             pred_col  = "Classification") {
+
+  if (!requireNamespace("lidR", quietly = TRUE)) {
+    stop("Package 'lidR' is required. Install it with install.packages('lidR').")
+  }
+
+  stopifnot(inherits(truth_las, "LAS"))
+  stopifnot(inherits(pred_las, "LAS"))
+
+  if (lidR::is.empty(truth_las) || lidR::is.empty(pred_las))
+    stop("One of the LAS objects is empty.")
+
+  if (!(truth_col %in% names(truth_las@data)))
+    stop(paste("Truth column", shQuote(truth_col), "not found in truth_las."))
+
+  if (!(pred_col %in% names(pred_las@data)))
+    stop(paste("Prediction column", shQuote(pred_col), "not found in pred_las."))
+
+  if (lidR::npoints(truth_las) != lidR::npoints(pred_las)) {
+    stop("LAS files are not point-wise aligned: different number of points.")
+  }
+
+  true_labels <- as.integer(truth_las@data[[truth_col]])
+  pred_labels <- as.integer(pred_las@data[[pred_col]])
+
+  cm <- table(True = true_labels, Pred = pred_labels)
+  acc <- sum(diag(cm)) / sum(cm)
+
+  m <- metrics_from_cm(cm)
 
   list(
     confusion = cm,
-    accuracy  = accuracy,
-    precision = precision,
-    recall    = recall,
-    f1        = f1
+    confusion_matrix = cm,
+    accuracy  = acc,
+    precision = m$precision,
+    recall    = m$recall,
+    f1        = m$f1
   )
 }
 
@@ -180,7 +274,7 @@ print_confusion_matrix <- function(cm) {
 # ------------------------------------------------------------
 #' Pretty-print evaluation metrics table with summary row
 #'
-#' @param results List returned by evaluate_single_las()
+#' @param results List returned by evaluate_single_las() or evaluate_two_las()
 #' @export
 print_metrics_table <- function(results) {
 
@@ -188,20 +282,26 @@ print_metrics_table <- function(results) {
   recall    <- results$recall
   f1        <- results$f1
 
+  if (is.null(precision) || is.null(recall) || is.null(f1)) {
+    stop("results must contain precision, recall, and f1 fields (output of evaluate_* functions).")
+  }
+
   df <- data.frame(
     Class     = names(precision),
-    Precision = round(precision, 4),
-    Recall    = round(recall, 4),
-    F1_Score  = round(f1, 4)
+    Precision = round(as.numeric(precision), 4),
+    Recall    = round(as.numeric(recall), 4),
+    F1_Score  = round(as.numeric(f1), 4),
+    stringsAsFactors = FALSE
   )
 
   df <- rbind(
     df,
     data.frame(
-      Class     = "Overall",
+      Class     = "Overall (macro avg)",
       Precision = round(mean(precision, na.rm = TRUE), 4),
       Recall    = round(mean(recall, na.rm = TRUE), 4),
-      F1_Score  = round(mean(f1, na.rm = TRUE), 4)
+      F1_Score  = round(mean(f1, na.rm = TRUE), 4),
+      stringsAsFactors = FALSE
     )
   )
 
