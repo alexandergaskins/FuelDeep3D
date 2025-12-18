@@ -118,66 +118,61 @@ las <- readLAS(system.file("extdata", "las", "trees.laz",
                            package = "FuelDeep3D"))
 
 # Visualize by elevation
-plot(las, color = "Z", colorPalette = height.colors(50))
+plot(las, color = "Z", pal = height.colors(30), bg='white')
 ```
 
 <p align="center">
-  <img src="readme/raw.png" alt="Raw LiDAR visualization" width="85%">
+  <img src="readme/raw_pal.png" alt="Raw LiDAR visualization" width="85%">
 </p>
 
 This view helps inspect canopy structure, terrain variation, and overall point-cloud quality.
 
 ---
 
-### 2.2 Visualize Model Predictions (Classification Field)
-
-After running prediction:
-
-```r
-predict(cfg, mode = "overwrite")
-```
-
-The predicted labels are written into the `Classification` field of the output LAS file.
-
-You can visualize them in R:
-
-```r
-las_pred <- readLAS("output_predictions/trees_predicted.las")
-
-# Color by predicted vegetation class
-plot(las_pred, color = "Classification")
-```
-
-
 ## 3. Pre-processing
 
-Pre-processing inlcudes ......
+Pre-processing prepares raw TLS point clouds for deep learning–based fuel
+segmentation. This step focuses on removing obvious outliers, standardizing
+point attributes, and improving the quality of model inputs prior to tiling
+and feature extraction.
 
-```r
-las_pred <- readLAS("output_predictions/trees_predicted.las")
+---
 
-# Color by predicted vegetation class
-plot(las_pred, color = "Classification")
-```
+### 3.1 Optional noise filtering
 
+TLS point clouds may contain isolated outlier points, particularly in sparse
+regions of the scene. To reduce the influence of these points, FuelDeep3D
+provides a utility function based on Statistical Outlier Removal (SOR).
 
-## 4.Predict on a new LAS using a pre-trained model
+The filtering is applied selectively to points above a user-defined height
+threshold, while points below this threshold are preserved. This helps remove
+sparse artifacts without affecting ground or lower vegetation structure.
+
+**Parameters:**
+- `height_thresh`: height (in meters) above which SOR is applied
+- `k`: number of nearest neighbors used to estimate local point spacing
+- `zscore`: standard deviation multiplier controlling outlier rejection
+
+#### Example: apply noise filtering
 
 ```r
 library(FuelDeep3D)
-library(reticulate)
-use_condaenv("pointnext", required = TRUE)
+library(lidR)
 
-cfg <- config(
-  las_path     = system.file("extdata", "las", "trees.laz", package = "FuelDeep3D"),  # any LAS or LAZ you want to segment
-  out_pred_dir = "output_predictions",
-  model_path   = system.file("extdata", "model", "best_model.pth", package = "FuelDeep3D"),       # your pre-trained checkpoint
-  num_classes = 3
+# Load TLS point cloud
+las <- readLAS(system.file("extdata", "las", "trees.laz",
+                           package = "FuelDeep3D"))
+
+# Apply SOR-based filtering
+las_clean <- remove_noise_sor(
+  las,
+  height_thresh = 5,
+  k = 20,
+  zscore = 2.5
 )
 
-predict(cfg, mode = "overwrite", setup_env = FALSE)
-# or keep original classification and add 'pred_label':
-# predict(cfg, mode = "extra", setup_env = FALSE)
+# Inspect the filtered point cloud
+plot(las_clean, color = "Z", pal = height.colors(30), bg = "white")
 ```
 
 ## 4. Train a new model on your own labelled LAS data
@@ -248,6 +243,25 @@ This returns a list with:
 
 ---
 
+### 5.1.1 Visualize Model Predictions (Classification Field)
+
+After running prediction:
+
+```r
+predict(cfg, mode = "overwrite")
+```
+
+The predicted labels are written into the `Classification` field of the output LAS file.
+
+You can visualize them in R:
+
+```r
+las_pred <- readLAS("output_predictions/trees_predicted.las")
+
+# Color by predicted vegetation class
+plot(las_pred, color = "Classification")
+```
+
 ### 5.2 Print Confusion Matrix
 
 ```r
@@ -267,7 +281,7 @@ This prints a clean, aligned table such as:
 
 ---
 
-### 5.3 Print Precision, Recall, and F1 in a Table
+### 5.3 Print Precision, Recall, F1 and Accuracy in a Table
 
 ```r
 print_metrics_table(results)
