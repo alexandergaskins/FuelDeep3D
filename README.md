@@ -276,7 +276,7 @@ FuelDeep3D includes evaluation utilities to measure segmentation quality using L
 
   ---
 
-  This helpt to return a list with:
+  This helps to return a list with:
 
   - `confusion` – confusion matrix  
   - `accuracy` – overall accuracy  
