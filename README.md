@@ -235,15 +235,15 @@ FuelDeep3D includes evaluation utilities to measure segmentation quality using L
     truth_col = "label",
     pred_col  = "Classification"
   )
-
-results$accuracy
-results$confusion_matrix
-results$precision
-results$recall
-results$f1
+  results$accuracy
+  results$confusion_matrix
+  results$precision
+  results$recall
+  results$f1
 
   ```
 
+ ---
 
   ### 5.1.2 Evaluate Two LAS Files
 
@@ -266,11 +266,11 @@ results$f1
     pred_col  = "Classification"
   )
 
-results$accuracy
-results$confusion_matrix
-results$precision
-results$recall
-results$f1
+  results$accuracy
+  results$confusion_matrix
+  results$precision
+  results$recall
+  results$f1
 
   ```
 
@@ -380,7 +380,7 @@ results$f1
 
 ---
 
-### 5.5 Predicted Result
+## 6 Predicted Result
 
 The figure below shows an example of the vegetation segmentation applied to a labeled LAS file.
 Each point is colored by its predicted class (e.g., ground/understory, stem, canopy foliage).
