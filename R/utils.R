@@ -308,3 +308,62 @@ print_metrics_table <- function(results) {
   rownames(df) <- NULL
   print(df)
 }
+
+
+#' Plot confusion matrix as a heatmap (ggplot2)
+#'
+#' @param cm Confusion matrix (table or matrix)
+#' @param title Plot title
+#' @param row_normalize Logical. If TRUE, normalize each row to sum to 1 (proportions).
+#' @param digits Integer. Rounding digits for displayed values when row_normalize=TRUE.
+#' @param show_values Logical. If TRUE, print values inside each cell.
+#'
+#' @return A ggplot object
+#' @export
+plot_confusion_matrix <- function(cm,
+                                  title = "Confusion Matrix",
+                                  row_normalize = FALSE,
+                                  digits = 3,
+                                  show_values = TRUE) {
+  if (!requireNamespace("ggplot2", quietly = TRUE)) {
+    stop("Package 'ggplot2' is required. Install it with install.packages('ggplot2').")
+  }
+
+  m <- as.matrix(cm)
+
+  # Optional row-normalization (each true-label row sums to 1)
+  if (isTRUE(row_normalize)) {
+    rs <- rowSums(m)
+    rs[rs == 0] <- NA_real_
+    m <- m / rs
+  }
+
+  df <- as.data.frame(as.table(m))
+  colnames(df) <- c("True", "Pred", "Value")
+
+  # Text labels inside cells
+  if (isTRUE(row_normalize)) {
+    df$Label <- ifelse(is.na(df$Value), "", format(round(df$Value, digits = digits), nsmall = digits))
+    fill_name <- "Proportion"
+  } else {
+    df$Label <- as.character(as.integer(round(df$Value)))
+    fill_name <- "Count"
+  }
+
+  p <- ggplot2::ggplot(df, ggplot2::aes(x = Pred, y = True, fill = Value)) +
+    ggplot2::geom_tile() +
+    ggplot2::coord_equal() +
+    ggplot2::labs(
+      title = title,
+      x = "Predicted Label",
+      y = "True Label",
+      fill = fill_name
+    ) +
+    ggplot2::theme_minimal()
+
+  if (isTRUE(show_values)) {
+    p <- p + ggplot2::geom_text(ggplot2::aes(label = Label), size = 4)
+  }
+
+  p
+}

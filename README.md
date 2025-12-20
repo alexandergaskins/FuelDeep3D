@@ -203,15 +203,7 @@ predict(cfg, mode = "overwrite", setup_env = FALSE)  # writes trees_predicted.la
 
 ## 5. Evaluation of Predicted LAS Files
 
-
-
-
 you can compute accuracy, confusion matrix, precision, recall, and F1 directly.
-
-
-
-
-
 
 FuelDeep3D includes evaluation utilities to measure segmentation quality using LAS/LAZ files. These tools compute:
 
@@ -306,9 +298,9 @@ results$f1
   ```
   | True \ Pred |       0 |       1 |       2 |
   |-------------|---------|---------|---------|
-  |    0        | 528404  |    1005 |    3253 |
+  |    0        | 528404  |    1005 |   3253  |
   |    1        | 25457   | 2598520 | 140186  |
-  |    2        | 24931   | 449195  | 867824  |
+  |    2        | 24931   |  449195 | 867824  |
 
   ```
 
@@ -337,7 +329,35 @@ results$f1
 
   ---
 
-  ### 5.4 Class Distribution Summary
+  ### 5.4 Plot Confusion Matrix (Heatmap)
+
+  FuelDeep3D can also plot the confusion matrix as a heatmap in R (requires `ggplot2`).  
+  These plots help quickly identify which classes are most frequently confused and whether errors are concentrated in specific rows/columns.
+
+  - `row_normalize = FALSE` shows **raw counts** (best when you want to see absolute error volume and class frequency).  
+  - `row_normalize = TRUE` shows **row-normalized proportions** (best for imbalanced datasets; each true-label row sums to 1 so you can compare class-wise performance fairly).  
+
+  ```r
+  # Counts heatmap (absolute number of points per cell)
+  plot_confusion_matrix(
+    results$confusion_matrix,
+    title = "Confusion Matrix (Counts)",
+    row_normalize = FALSE
+  )
+  ```
+
+  # Row-normalized heatmap (proportion per true class; easier to compare classes)
+
+  ```r
+  plot_confusion_matrix(
+    results$confusion_matrix,
+    title = "Confusion Matrix (Row-Normalized)",
+    row_normalize = TRUE
+  )
+  ```
+ ---
+ 
+  ### 5.5 Class Distribution Summary
 
   ```r
   class_summary(las)
