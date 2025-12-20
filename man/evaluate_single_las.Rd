@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{evaluate_single_las}
 \alias{evaluate_single_las}
-\title{Evaluate LAS Using Custom Field Names}
+\title{Evaluate a single LAS using custom field names}
 \usage{
 evaluate_single_las(las, truth_col = "label", pred_col = "Classification")
 }
@@ -17,5 +17,6 @@ evaluate_single_las(las, truth_col = "label", pred_col = "Classification")
 list with confusion matrix, accuracy, precision, recall, F1
 }
 \description{
-Computes confusion matrix, accuracy, per-class precision, recall, and F1 scores.
+Computes confusion matrix, accuracy, and per-class precision/recall/F1
+from one LAS file that contains both truth and prediction fields.
 }

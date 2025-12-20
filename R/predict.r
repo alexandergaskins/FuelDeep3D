@@ -85,7 +85,7 @@ predict <- function(cfg, mode = c("overwrite", "extra"), setup_env = FALSE,
   ext  <- tools::file_ext(pred_las)
   out_las <- file.path(out_dir, paste0(base, "_ground.", ext))
   
-  FuelDeep3D::add_ground_csf(
+  add_ground_csf(
     in_las  = pred_las,
     out_las = out_las,
     csf_args = csf_args

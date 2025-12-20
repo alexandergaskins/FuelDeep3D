@@ -7,7 +7,7 @@
 print_metrics_table(results)
 }
 \arguments{
-\item{results}{List returned by evaluate_single_las()}
+\item{results}{List returned by evaluate_single_las() or evaluate_two_las()}
 }
 \description{
 Pretty-print evaluation metrics table with summary row

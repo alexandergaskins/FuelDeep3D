@@ -19,7 +19,8 @@ Suggests:
     reticulate,
     lidR,
     rgl,
-    RCSF
+    RCSF,
+    ggplot2
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
