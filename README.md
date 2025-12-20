@@ -23,12 +23,12 @@ The package enables users to move efficiently from raw .las files to classified 
 
 FuelDeep3D offers tools to:
 
--Build structured training datasets from labeled point clouds
--Compute height-derived features such as height-above-ground (HAG)
--Tile, sample, and preprocess large TLS scenes for efficient modeling
--Apply trained models to new .las files and write predictions back to disk
--Enable users to train their own deep learning models on custom labeled datasets
--Perform visualization, quality control, and evaluation of predicted fuel classes
+- Build structured training datasets from labeled point clouds
+- Compute height-derived features such as height-above-ground (HAG)
+- Tile, sample, and preprocess large TLS scenes for efficient modeling
+- Apply trained models to new .las files and write predictions back to disk
+- Enable users to train their own deep learning models on custom labeled datasets
+- Perform visualization, quality control, and evaluation of predicted fuel classes
 
 
 ---
