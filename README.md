@@ -11,7 +11,7 @@ badge](https://venkatasivanaga.dev/badges/FuelDeep3D)](https://venkatasivanaga.r
 
 # FuelDeep3D: An R package for Fire Fuels Segmentation in 3D Using Terrestrial Laser Scanning and Deep Learning  
 
-**Authors:** Venkata Siva Reddy Naga, Carlos Alberto Silva, et al.,
+**Authors:** Venkata Siva Reddy Naga, Carlos Alberto Silva.
 
 
 `FuelDeep3D` provides tools for processing, feature extraction, and classification of 3D forest point clouds for fuel assessment applications. 
@@ -346,7 +346,11 @@ results$f1
   )
   ```
 
-  # Row-normalized heatmap (proportion per true class; easier to compare classes)
+<p align="center">
+  <img src="readme/heat_map_1.png" alt="Raw LiDAR visualization" width="85%">
+</p>
+
+   Row-normalized heatmap (proportion per true class; easier to compare classes)
 
   ```r
   plot_confusion_matrix(
@@ -355,8 +359,13 @@ results$f1
     row_normalize = TRUE
   )
   ```
+<p align="center">
+  <img src="readme/heat_map_2.png" alt="Raw LiDAR visualization" width="85%">
+</p>
+
+
  ---
- 
+
   ### 5.5 Class Distribution Summary
 
   ```r
