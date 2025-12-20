@@ -347,7 +347,7 @@ results$f1
   ```
 
 <p align="center">
-  <img src="readme/heat_map_1.png" alt="Raw LiDAR visualization" width="85%">
+  <img src="readme/heat_map_1.png" alt="Confusion Matrix" width="50%">
 </p>
 
    Row-normalized heatmap (proportion per true class; easier to compare classes)
@@ -360,7 +360,7 @@ results$f1
   )
   ```
 <p align="center">
-  <img src="readme/heat_map_2.png" alt="Raw LiDAR visualization" width="85%">
+  <img src="readme/heat_map_2.png" alt="Confusion Matrix" width="60%">
 </p>
 
 
