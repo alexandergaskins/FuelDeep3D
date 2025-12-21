@@ -133,11 +133,7 @@ remove_noise_sor <- function(las,
   high_clean <- high_pts[keep]
 
   # Combine back
-  if (exists("rbind_las", where = asNamespace("lidR"), inherits = FALSE)) {
-    lidR::rbind_las(low_pts, high_clean)
-  } else {
-    rbind(low_pts, high_clean)
-  }
+rbind(low_pts, high_clean)
 }
 
 # ============================================================
