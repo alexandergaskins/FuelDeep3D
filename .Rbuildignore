@@ -6,3 +6,4 @@
 ^dev\$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^dev$

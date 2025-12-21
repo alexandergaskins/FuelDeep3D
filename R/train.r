@@ -23,7 +23,7 @@ train <- function(cfg, setup_env = FALSE) {
   
   if (!has_npz) {
     message(">> No NPZ tiles found in ", train_dir,
-            " — running build_dataset_from_las() ...")
+            " -> running build_dataset_from_las() ...")
     
     py_dataset <- reticulate::import_from_path("dataset", path = py_dir, delay_load = FALSE)
     
@@ -42,7 +42,7 @@ train <- function(cfg, setup_env = FALSE) {
       QUANTILE        = cfg$quantile
     )
   } else {
-    message(">> Found existing NPZ tiles in ", train_dir, " — skipping preprocessing.")
+    message(">> Found existing NPZ tiles in ", train_dir, " -> skipping preprocessing.")
   }
   
   # ---- 2) Import Python trainer ----

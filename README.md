@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="readme/logo_gif.gif" alt="Single tree segmentation output" width="100%">
+  <img src="inst/readme/logo_gif.gif" alt="Single tree segmentation output" width="100%">
 </p>
 
 [![FuelDeep3D status
@@ -69,7 +69,7 @@ library(FuelDeep3D)
    - Keep the default install location (e.g. `C:\Users\<you>\anaconda3`).
    - *Optional but convenient:* check **“Add Anaconda to my PATH”** if you want
      to use `conda` from a normal Command Prompt.
-3. Click **Next → Install** and wait for the installation to finish.
+3. Click **Next - Install** and wait for the installation to finish.
 4. Open **Anaconda Prompt** from the Start menu and run:
 
    ```bash
@@ -122,7 +122,7 @@ plot(las, color = "Z", pal = height.colors(30), bg='white')
 ```
 
 <p align="center">
-  <img src="readme/raw_pal.png" alt="Raw LiDAR visualization" width="85%">
+  <img src="inst/readme/raw_pal.png" alt="Raw LiDAR visualization" width="85%">
 </p>
 
 This view helps inspect canopy structure, terrain variation, and overall point-cloud quality.
@@ -347,7 +347,7 @@ FuelDeep3D includes evaluation utilities to measure segmentation quality using L
   ```
 
 <p align="center">
-  <img src="readme/heat_map_1.png" alt="Confusion Matrix" width="45%">
+  <img src="inst/readme/heat_map_1.png" alt="Confusion Matrix" width="45%">
 </p>
 
    Row-normalized heatmap (proportion per true class; easier to compare classes)
@@ -360,7 +360,7 @@ FuelDeep3D includes evaluation utilities to measure segmentation quality using L
   )
   ```
 <p align="center">
-  <img src="readme/heat_map_2.png" alt="Confusion Matrix" width="45%">
+  <img src="inst/readme/heat_map_2.png" alt="Confusion Matrix" width="45%">
 </p>
 
 
@@ -385,10 +385,10 @@ FuelDeep3D includes evaluation utilities to measure segmentation quality using L
 The figure below shows an example of the vegetation segmentation applied to a labeled LAS file.
 Each point is colored by its predicted class (e.g., ground/understory, stem, canopy foliage).
 
-![Example segmentation output](readme/trees.png)
+![Example segmentation output](inst/readme/trees.png)
 
 <p align="center">
-  <img src="readme/tree.gif" alt="Single tree segmentation output" width="45%">
+  <img src="inst/readme/tree.gif" alt="Single tree segmentation output" width="45%">
 </p>
 
 

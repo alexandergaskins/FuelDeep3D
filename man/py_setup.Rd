@@ -6,6 +6,9 @@
 \usage{
 py_setup(envdir = NULL)
 }
+\arguments{
+\item{envdir}{Path to the Python environment directory.}
+}
 \description{
 Create/use a venv and install Python deps listed in extdata/python/requirements.txt
 }

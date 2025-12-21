@@ -1,5 +1,7 @@
 #' Create/use a venv and install Python deps listed in extdata/python/requirements.txt
 #' @export
+#' @param envdir Path to the Python environment directory.
+
 py_setup <- function(envdir = NULL) {
   # Locate the installed python directory from extdata/python
   py_root <- system.file("python", package = "FuelDeep3D")

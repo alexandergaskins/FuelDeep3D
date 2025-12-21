@@ -35,18 +35,25 @@ plot_las_3d <- function(las,
                         title = "LAS 3D View") {
 
   if (!requireNamespace("lidR", quietly = TRUE)) {
-    stop("Package 'lidR' is required. Install it with install.packages('lidR').")
-  }
-  if (!requireNamespace("rgl", quietly = TRUE)) {
-    stop("Package 'rgl' is required for 3D plotting. Install it with install.packages('rgl').")
+    stop("Package 'lidR' is required.")
   }
 
   stopifnot(inherits(las, "LAS"))
 
+  # ---- HARD CRAN GUARD ----
+  if (identical(Sys.getenv("_R_CHECK_PACKAGE_NAME_"), "FuelDeep3D")) {
+    warning("Skipping rgl visualization during R CMD check.")
+    return(invisible(NULL))
+  }
+
+  if (!requireNamespace("rgl", quietly = TRUE)) {
+    warning("Package 'rgl' is not installed.")
+    return(invisible(NULL))
+  }
+
   rgl::open3d()
   rgl::title3d(title)
 
-  # Prefer standard LAS column names
   xyz <- las@data[, c("X", "Y", "Z"), drop = FALSE]
 
   rgl::points3d(

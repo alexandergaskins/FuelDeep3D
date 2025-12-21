@@ -1,3 +1,5 @@
+utils::globalVariables(c("Pred", "True", "Value", "Label"))
+
 .onLoad <- function(libname, pkgname) {
   # Locate the installed extdata/python directory
   py_root <- system.file("python", package = pkgname)

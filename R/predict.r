@@ -71,14 +71,14 @@ predict <- function(cfg, mode = c("overwrite", "extra"), setup_env = FALSE,
     mode    = mode
   )
   
-  # --- 7) If num_classes == 3 → return immediately ---
+  # --- 7) If num_classes == 3 - return immediately ---
   if (cfg$num_classes == 3) {
-    message(">> num_classes = 3 → returning 3-class output")
+    message(">> num_classes = 3 - returning 3-class output")
     return(pred_las)
   }
   
-  # --- 8) If num_classes == 4 → apply CSF ground extraction ---
-  message(">> num_classes = 4 → adding ground class using CSF ...")
+  # --- 8) If num_classes == 4 - apply CSF ground extraction ---
+  message(">> num_classes = 4 - adding ground class using CSF ...")
   
   # Output name for final LAS
   base <- tools::file_path_sans_ext(basename(pred_las))
