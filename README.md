@@ -2,7 +2,7 @@
   <img src="inst/readme/logo_gif.gif" alt="Single tree segmentation output" width="100%">
 </p>
 
-[![R-hub](https://github.com/venkatasivanaga/FuelDeep3D/actions/workflows/rhub.yaml/badge.svg)](https://github.com/carlos-alberto-silva/ICESat2VegR/actions/workflows/rhub.yaml)
+[![R-hub](https://github.com/venkatasivanaga/FuelDeep3D/actions/workflows/rhub.yaml/badge.svg)](https://github.com/venkatasivanaga/FuelDeep3D/actions/workflows/rhub.yaml)
 [![CRAN](https://www.r-pkg.org/badges/version/FuelDeep3D)](https://cran.r-project.org/package=FuelDeep3D)
 ![GitHub](https://img.shields.io/badge/GitHub-0.1.0-green.svg)
 ![licence](https://img.shields.io/badge/Licence-GPL--3-blue.svg)
@@ -438,6 +438,7 @@ available at: <https://CRAN.R-project.org/package=FuelDeep3D>
 **FuelDeep3D package comes with no guarantee, expressed or implied, and
 the authors hold no responsibility for its use or reliability of its
 outputs.**
+
 
 
 
