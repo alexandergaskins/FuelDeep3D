@@ -1,21 +1,30 @@
-#' Ensure a Conda environment and Python deps for FuelDeep3D
+#' Ensure a Conda environment and Python dependencies for FuelDeep3D
 #'
-#' This helper will:
-#' 1. Check if the Conda env exists; if not, create it with the requested
-#'    Python version.
-#' 2. Check whether key Python modules are importable from that env.
-#'    If any are missing, it installs the full dependency set via pip.
-#' 3. Activate the env for the current R session via `reticulate::use_condaenv()`.
+#' This helper:
+#' \enumerate{
+#'   \item Checks whether a Conda environment exists; if not, creates it with the requested Python version.
+#'   \item Installs Python dependencies (via pip) when missing (or always when `reinstall = TRUE`).
+#'   \item Activates the environment for the current R session using [reticulate::use_condaenv()].
+#' }
 #'
-#' @param envname Name of the Conda environment to use/create.
-#'   Defaults to `"pointnext"`.
-#' @param python_version Python version to use when creating the env
-#'   (ignored if env already exists). Default: `"3.10"`.
-#' @param reinstall Logical; if `TRUE`, always reinstall Python deps
-#'   even if key modules are already present. Default: `FALSE`.
+#' @param envname Name of the Conda environment to use/create. Default: `"pointnext"`.
+#' @param python_version Python version to use when creating the env (ignored if env already exists).
+#'   Default: `"3.10"`.
+#' @param reinstall Logical; if `TRUE`, always reinstall Python deps even if key modules are already present.
+#'   Default: `FALSE`.
 #'
-#' @return Invisibly returns `TRUE` if the environment exists/was created
-#'   and is ready to use.
+#' @return Invisibly returns `TRUE` when the environment is ready and activated.
+#'
+#' @seealso [install_py_deps()], [reticulate::conda_create()], [reticulate::use_condaenv()]
+#'
+#' @examples
+#' \dontrun{
+#' # Requires Conda and an internet connection
+#' ensure_py_env(envname = "pointnext", python_version = "3.10")
+#'
+#' # Confirm which Python reticulate is using:
+#' reticulate::py_config()
+#' }
 #' @export
 ensure_py_env <- function(envname = "pointnext",
                           python_version = "3.10",

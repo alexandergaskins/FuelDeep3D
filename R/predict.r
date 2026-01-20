@@ -1,11 +1,36 @@
-#' Run prediction on cfg$las_path and write output LAS
-#' If cfg$num_classes == 4, add ground using CSF automatically.
+#' Predict fuel classes for a LAS/LAZ file using a pre-trained model
 #'
-#' @param cfg list from config()
-#' @param mode "overwrite" or "extra"
-#' @param setup_env logical; FALSE if you already have Python env
-#' @param csf_args list passed to add_ground_csf() if num_classes == 4
-#' @return path to output LAS
+#' Runs FuelDeep3D inference on `cfg$las_path` using the Python model shipped with the
+#' package (via `reticulate`). Predictions are written to a new LAS/LAZ file.
+#'
+#' If `cfg$num_classes == 4`, this function additionally runs CSF-based ground detection
+#' via [add_ground_csf()] and writes a final 4-class LAS/LAZ where ground points are
+#' assigned class `3`.
+#'
+#' @param cfg A configuration list created by [config()].
+#' @param mode Character. `"overwrite"` replaces the LAS `Classification` values with
+#'   model predictions; `"extra"` keeps original classification and adds a new attribute
+#'   for predictions (behavior depends on the Python writer).
+#' @param setup_env Logical. If `TRUE`, calls [py_setup()] (or your env setup helper)
+#'   before importing Python modules. Default: `FALSE`.
+#' @param csf_args List of arguments passed to [add_ground_csf()] when `cfg$num_classes == 4`.
+#'
+#' @return A character string giving the path to the output LAS/LAZ file.
+#'
+#' @examples
+#' \dontrun{
+#' library(FuelDeep3D)
+#'
+#' cfg <- config(
+#'   las_path     = system.file("extdata", "las", "tree2.laz", package = "FuelDeep3D"),
+#'   out_pred_dir = tempdir(),
+#'   model_path   = system.file("extdata", "model", "best_model.pth", package = "FuelDeep3D"),
+#'   num_classes  = 3
+#' )
+#'
+#' out_las <- predict(cfg, mode = "overwrite", setup_env = FALSE)
+#' out_las
+#' }
 #' @export
 predict <- function(cfg, mode = c("overwrite", "extra"), setup_env = FALSE,
                     csf_args = list()) {

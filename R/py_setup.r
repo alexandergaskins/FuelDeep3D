@@ -1,10 +1,15 @@
 #' Create/use a venv and install Python deps listed in extdata/python/requirements.txt
-#' @export
 #' @param envdir Path to the Python environment directory.
-
+#' @examples
+#' \dontrun{
+#' # Creates/uses a Python virtualenv and installs requirements.txt
+#' env <- py_setup()
+#' env
+#' }
+#' @export
 py_setup <- function(envdir = NULL) {
   # Locate the installed python directory from extdata/python
-  py_root <- system.file("python", package = "FuelDeep3D")
+  py_root <- system.file("extdata", "python", package = "FuelDeep3D")
   if (py_root == "" || !dir.exists(py_root)) {
     stop("Could not find 'extdata/python' directory in the installed 'FuelDeep3D' package.")
   }
