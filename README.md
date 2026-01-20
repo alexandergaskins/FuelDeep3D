@@ -12,7 +12,7 @@
 
 # FuelDeep3D: An R package for Fire Fuels Segmentation in 3D Using Terrestrial Laser Scanning and Deep Learning  
 
-**Authors:** Venkata Siva Reddy Naga, Carlos Alberto Silva.
+**Authors:** Venkata Siva Reddy Naga and Carlos Alberto Silva.
 
 
 `FuelDeep3D` provides tools for processing, feature extraction, and classification of 3D forest point clouds for fuel assessment applications. 
@@ -52,7 +52,7 @@ library(FuelDeep3D)
 
 ---
 
-### 1.2 Manual install (official Anaconda)
+### 1.1.1 Manual installation using Anaconda/Miniconda
 
 **i) Download**
 
@@ -76,10 +76,10 @@ library(FuelDeep3D)
    ```bash
    conda --version
 
-### 1.3 Create the `pointnext` Conda environment (from R)
+### 1.1.2 Create the `pointnext` Conda environment 
 
 You can create the Python environment directly from R using **reticulate** and
-install all Python dependencies from `requirements.txt`.
+install all Python dependencies.
 
 ```r
 # 0) Install FuelDeep3D and reticulate if not already
@@ -99,7 +99,7 @@ py_config()
 ```
 ---
 
-## 2. Visualization
+## 2. Visualization of a 3D point cloud
 
 `FuelDeep3D` integrates smoothly with the **lidR** package, enabling users to quickly explore
 raw LiDAR scenes, height structures, and model-predicted segmentations.  
@@ -130,7 +130,7 @@ This view helps inspect canopy structure, terrain variation, and overall point-c
 
 ---
 
-## 3. Predict on a new LAS using a pre-trained model
+## 3. Predict on a new lidar using a pre-trained model
 
 ```r
 library(FuelDeep3D)
@@ -149,6 +149,23 @@ predict(cfg, mode = "overwrite", setup_env = FALSE)
 # predict(cfg, mode = "extra", setup_env = FALSE)
 ```
 
+## 3.1 Predicted Result
+
+The figure below shows an example of the vegetation segmentation applied to a labeled LAS file.
+Each point is colored by its predicted class (e.g., ground/understory, stem, canopy foliage).
+
+![Example segmentation output](inst/readme/trees.png)
+
+<p align="center">
+  <img src="inst/readme/tree.gif" alt="Single tree segmentation output" width="45%">
+</p>
+
+
+In this example, the model was trained on `trees.las` and then used to predict labels for the
+same scene. The output LAS (`trees_predicted.las`) stores predictions in the `classification`
+field, which can be visualized in tools like CloudCompare or QGIS using a class-based color ramp.
+
+---
 
 ## 4. Pre-processing
 
@@ -401,24 +418,6 @@ FuelDeep3D includes evaluation utilities to measure segmentation quality using L
 
 ---
 
-## 7. Predicted Result
-
-The figure below shows an example of the vegetation segmentation applied to a labeled LAS file.
-Each point is colored by its predicted class (e.g., ground/understory, stem, canopy foliage).
-
-![Example segmentation output](inst/readme/trees.png)
-
-<p align="center">
-  <img src="inst/readme/tree.gif" alt="Single tree segmentation output" width="45%">
-</p>
-
-
-In this example, the model was trained on `trees.las` and then used to predict labels for the
-same scene. The output LAS (`trees_predicted.las`) stores predictions in the `classification`
-field, which can be visualized in tools like CloudCompare or QGIS using a class-based color ramp.
-
----
-
 # Acknowledgements
 
 We gratefully acknowledge ------------
@@ -438,6 +437,7 @@ available at: <https://CRAN.R-project.org/package=FuelDeep3D>
 **FuelDeep3D package comes with no guarantee, expressed or implied, and
 the authors hold no responsibility for its use or reliability of its
 outputs.**
+
 
 
 
