@@ -2,16 +2,17 @@
   <img src="inst/readme/logo_gif.gif" alt="Single tree segmentation output" width="100%">
 </p>
 
-[![FuelDeep3D status
-badge](https://venkatasivanaga.dev/badges/FuelDeep3D)](https://venkatasivanaga.r-universe.dev/FuelDeep3D)
-[![R-hub](https://github.com/carlos-alberto-silva/ICESat2VegR/actions/workflows/rhub.yaml/badge.svg)](https://github.com/carlos-alberto-silva/ICESat2VegR/actions/workflows/rhub.yaml)
+[![R-hub](https://github.com/venkatasivanaga/FuelDeep3D/actions/workflows/rhub.yaml/badge.svg)](https://github.com/venkatasivanaga/FuelDeep3D/actions/workflows/rhub.yaml)
 [![CRAN](https://www.r-pkg.org/badges/version/FuelDeep3D)](https://cran.r-project.org/package=FuelDeep3D)
+![GitHub](https://img.shields.io/badge/GitHub-0.1.0-green.svg)
 ![licence](https://img.shields.io/badge/Licence-GPL--3-blue.svg)
 ![Downloads](https://cranlogs.r-pkg.org/badges/grand-total/FuelDeep3D)
+[![Build Status](https://app.travis-ci.com/venkatasivanaga/FuelDeep3D.svg?branch=main)](https://app.travis-ci.com/venkatasivanaga/FuelDeep3D)
+[![FuelDeep3D statusbadge](https://venkatasivanaga.dev/badges/FuelDeep3D)](https://venkatasivanaga.r-universe.dev/FuelDeep3D)
 
 # FuelDeep3D: An R package for Fire Fuels Segmentation in 3D Using Terrestrial Laser Scanning and Deep Learning  
 
-**Authors:** Venkata Siva Reddy Naga, Carlos Alberto Silva.
+**Authors:** Venkata Siva Reddy Naga and Carlos Alberto Silva.
 
 
 `FuelDeep3D` provides tools for processing, feature extraction, and classification of 3D forest point clouds for fuel assessment applications. 
@@ -51,7 +52,7 @@ library(FuelDeep3D)
 
 ---
 
-### 1.2 Manual install (official Anaconda)
+### 1.1.1 Manual installation using Anaconda/Miniconda
 
 **i) Download**
 
@@ -75,10 +76,10 @@ library(FuelDeep3D)
    ```bash
    conda --version
 
-### 1.3 Create the `pointnext` Conda environment (from R)
+### 1.1.2 Create the `pointnext` Conda environment 
 
 You can create the Python environment directly from R using **reticulate** and
-install all Python dependencies from `requirements.txt`.
+install all Python dependencies.
 
 ```r
 # 0) Install FuelDeep3D and reticulate if not already
@@ -98,7 +99,7 @@ py_config()
 ```
 ---
 
-## 2. Visualization
+## 2. Visualization of a 3D point cloud
 
 `FuelDeep3D` integrates smoothly with the **lidR** package, enabling users to quickly explore
 raw LiDAR scenes, height structures, and model-predicted segmentations.  
@@ -129,7 +130,44 @@ This view helps inspect canopy structure, terrain variation, and overall point-c
 
 ---
 
-## 3. Pre-processing
+## 3. Predict on a new lidar using a pre-trained model
+
+```r
+library(FuelDeep3D)
+library(reticulate)
+use_condaenv("pointnext", required = TRUE)
+
+cfg <- config(
+  las_path     = system.file("extdata", "las", "trees.laz", package = "FuelDeep3D"),  # any LAS or LAZ you want to segment
+  out_pred_dir = "output_predictions",
+  model_path   = system.file("extdata", "model", "best_model.pth", package = "FuelDeep3D"),       # your pre-trained checkpoint
+  num_classes = 3
+)
+
+predict(cfg, mode = "overwrite", setup_env = FALSE)
+# or keep original classification and add 'pred_label':
+# predict(cfg, mode = "extra", setup_env = FALSE)
+```
+
+## 3.1 Predicted Result
+
+The figure below shows an example of the vegetation segmentation applied to a labeled LAS file.
+Each point is colored by its predicted class (e.g., ground/understory, stem, canopy foliage).
+
+![Example segmentation output](inst/readme/trees.png)
+
+<p align="center">
+  <img src="inst/readme/tree.gif" alt="Single tree segmentation output" width="45%">
+</p>
+
+
+In this example, the model was trained on `trees.las` and then used to predict labels for the
+same scene. The output LAS (`trees_predicted.las`) stores predictions in the `classification`
+field, which can be visualized in tools like CloudCompare or QGIS using a class-based color ramp.
+
+---
+
+## 4. Pre-processing
 
 Pre-processing prepares raw TLS point clouds for deep learning–based fuel
 segmentation. This step focuses on removing obvious outliers, standardizing
@@ -138,7 +176,7 @@ and feature extraction.
 
 ---
 
-### 3.1 Optional noise filtering
+### 4.1 Optional noise filtering
 
 TLS point clouds may contain isolated outlier points, particularly in sparse
 regions of the scene. To reduce the influence of these points, FuelDeep3D
@@ -175,7 +213,7 @@ las_clean <- remove_noise_sor(
 plot(las_clean, color = "Z", pal = height.colors(30), bg = "white")
 ```
 
-## 4. Train a new model on your own labelled LAS data
+## 5. Train a new model on your own labelled LAS data
 
 
 ```r
@@ -201,7 +239,7 @@ predict(cfg, mode = "overwrite", setup_env = FALSE)  # writes trees_predicted.la
 
 ---
 
-## 5. Evaluation of Predicted LAS Files
+## 6. Evaluation of Predicted LAS Files
 
 you can compute accuracy, confusion matrix, precision, recall, and F1 directly.
 
@@ -213,7 +251,7 @@ FuelDeep3D includes evaluation utilities to measure segmentation quality using L
 
 ---
 
-  ### 5.1.1 Evaluate a Single LAS File
+  ### 6.1.1 Evaluate a Single LAS File
 
   This function allows users to evaluate segmentation performance directly from a single LAS file that contains both ground-truth labels and predicted classes.
   Simply specify which attribute stores the true labels (e.g., "label") and which stores the predictions (e.g., "Classification"), and the function computes accuracy, confusion matrix, precision, recall, and F1 scores automatically.
@@ -245,7 +283,7 @@ FuelDeep3D includes evaluation utilities to measure segmentation quality using L
 
  ---
 
-  ### 5.1.2 Evaluate Two LAS Files
+  ### 6.1.2 Evaluate Two LAS Files
 
   Use this when ground truth labels and predicted classes are saved in two separate LAS/LAZ files.
   Both files must be point-wise aligned (same points in the same order, same number of points).
@@ -287,7 +325,7 @@ FuelDeep3D includes evaluation utilities to measure segmentation quality using L
   ---
 
 
-  ### 5.2 Print Confusion Matrix
+  ### 6.2 Print Confusion Matrix
 
   ```r
   print_confusion_matrix(results$confusion)
@@ -306,7 +344,7 @@ FuelDeep3D includes evaluation utilities to measure segmentation quality using L
 
   ---
 
-  ### 5.3 Print Precision, Recall, F1 and Accuracy in a Table
+  ### 6.3 Print Precision, Recall, F1 and Accuracy in a Table
 
   ```r
   print_metrics_table(results)
@@ -329,7 +367,7 @@ FuelDeep3D includes evaluation utilities to measure segmentation quality using L
 
   ---
 
-  ### 5.4 Plot Confusion Matrix (Heatmap)
+  ### 6.4 Plot Confusion Matrix (Heatmap)
 
   FuelDeep3D can also plot the confusion matrix as a heatmap in R (requires `ggplot2`).  
   These plots help quickly identify which classes are most frequently confused and whether errors are concentrated in specific rows/columns.
@@ -366,7 +404,7 @@ FuelDeep3D includes evaluation utilities to measure segmentation quality using L
 
  ---
 
-  ### 5.5 Class Distribution Summary
+  ### 6.5 Class Distribution Summary
 
   ```r
   class_summary(las)
@@ -377,24 +415,6 @@ FuelDeep3D includes evaluation utilities to measure segmentation quality using L
   ---
 
   These tools make it simple to evaluate segmentation performance directly from a LAS file without requiring external scripts or reformatting.
-
----
-
-## 6 Predicted Result
-
-The figure below shows an example of the vegetation segmentation applied to a labeled LAS file.
-Each point is colored by its predicted class (e.g., ground/understory, stem, canopy foliage).
-
-![Example segmentation output](inst/readme/trees.png)
-
-<p align="center">
-  <img src="inst/readme/tree.gif" alt="Single tree segmentation output" width="45%">
-</p>
-
-
-In this example, the model was trained on `trees.las` and then used to predict labels for the
-same scene. The output LAS (`trees_predicted.las`) stores predictions in the `classification`
-field, which can be visualized in tools like CloudCompare or QGIS using a class-based color ramp.
 
 ---
 
@@ -417,3 +437,8 @@ available at: <https://CRAN.R-project.org/package=FuelDeep3D>
 **FuelDeep3D package comes with no guarantee, expressed or implied, and
 the authors hold no responsibility for its use or reliability of its
 outputs.**
+
+
+
+
+
