@@ -2,13 +2,25 @@
 % Please edit documentation in R/utils.R
 \name{print_metrics_table}
 \alias{print_metrics_table}
-\title{Pretty-print evaluation metrics table with summary row}
+\title{Pretty-print evaluation metrics table with a macro-average summary row}
 \usage{
 print_metrics_table(results)
 }
 \arguments{
-\item{results}{List returned by evaluate_single_las() or evaluate_two_las()}
+\item{results}{List returned by \code{evaluate_single_las()} or \code{evaluate_two_las()}.}
+}
+\value{
+Invisibly returns the metrics data.frame.
 }
 \description{
-Pretty-print evaluation metrics table with summary row
+Prints a table with per-class precision/recall/F1 and an overall macro-average row.
+}
+\examples{
+cm <- table(True = c(0, 0, 1, 1), Pred = c(0, 1, 1, 1))
+pr <- diag(cm) / colSums(cm)
+rc <- diag(cm) / rowSums(cm)
+f1 <- 2 * pr * rc / (pr + rc)
+res <- list(precision = pr, recall = rc, f1 = f1)
+print_metrics_table(res)
+
 }

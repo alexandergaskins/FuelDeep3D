@@ -2,19 +2,37 @@
 % Please edit documentation in R/utils.R
 \name{plot_las_3d}
 \alias{plot_las_3d}
-\title{3D Visualization of LAS Using RGL}
+\title{3D visualization of a LAS object using rgl}
 \usage{
 plot_las_3d(las, palette = palette_veg(), size = 2, title = "LAS 3D View")
 }
 \arguments{
-\item{las}{LAS object}
+\item{las}{A \code{lidR::LAS} object.}
 
-\item{palette}{Color palette for classes}
+\item{palette}{Named color vector (names are class IDs as strings).}
 
-\item{size}{Point size}
+\item{size}{Numeric. Point size passed to \code{rgl::points3d()}.}
 
-\item{title}{Plot title}
+\item{title}{Character. Title shown in the 3D window.}
+}
+\value{
+Invisibly returns \code{NULL}.
 }
 \description{
-3D Visualization of LAS Using RGL
+Opens an interactive 3D window and plots points colored by the LAS
+\code{Classification} field.
+}
+\details{
+This function is intentionally skipped during \code{R CMD check} to
+avoid interactive graphics in CRAN checks.
+}
+\examples{
+\donttest{
+library(lidR)
+las <- readLAS(system.file("extdata", "las", "tree2.laz", package = "FuelDeep3D"))
+if (!lidR::is.empty(las)) {
+  plot_las_3d(las)
+}
+}
+
 }

@@ -12,18 +12,31 @@ evaluate_two_las(
 )
 }
 \arguments{
-\item{truth_las}{LAS containing ground-truth labels}
+\item{truth_las}{A \code{lidR::LAS} object containing ground-truth labels.}
 
-\item{pred_las}{LAS containing predicted labels}
+\item{pred_las}{A \code{lidR::LAS} object containing predicted labels.}
 
-\item{truth_col}{Name of truth label field in truth_las (default = "label")}
+\item{truth_col}{Character. Name of truth label field in \code{truth_las} (default = "label").}
 
-\item{pred_col}{Name of prediction field in pred_las (default = "Classification")}
+\item{pred_col}{Character. Name of prediction field in \code{pred_las} (default = "Classification").}
 }
 \value{
-list with confusion matrix, accuracy, precision, recall, F1
+A list with confusion matrix, accuracy, precision, recall, and F1.
 }
 \description{
 Computes confusion matrix, accuracy, and per-class precision/recall/F1
-using two separate LAS/LAZ files that are point-wise aligned.
+using two separate LAS objects that are point-wise aligned (same number of points).
+}
+\examples{
+\donttest{
+library(lidR)
+truth <- readLAS(system.file("extdata", "las", "tree2.laz", package = "FuelDeep3D"))
+pred  <- readLAS(system.file("extdata", "las", "tree2.laz", package = "FuelDeep3D"))
+if (!lidR::is.empty(truth) && !lidR::is.empty(pred)) {
+  truth@data$label <- as.integer(truth@data$Classification)
+  res <- evaluate_two_las(truth, pred, truth_col = "label", pred_col = "Classification")
+  res$accuracy
+}
+}
+
 }

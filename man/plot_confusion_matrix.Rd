@@ -13,19 +13,28 @@ plot_confusion_matrix(
 )
 }
 \arguments{
-\item{cm}{Confusion matrix (table or matrix)}
+\item{cm}{Confusion matrix (table or matrix).}
 
-\item{title}{Plot title}
+\item{title}{Character. Plot title.}
 
 \item{row_normalize}{Logical. If TRUE, normalize each row to sum to 1 (proportions).}
 
-\item{digits}{Integer. Rounding digits for displayed values when row_normalize=TRUE.}
+\item{digits}{Integer. Rounding digits for displayed values when row_normalize = TRUE.}
 
-\item{show_values}{Logical. If TRUE, print values inside each cell.}
+\item{show_values}{Logical. If TRUE, prints values inside each cell.}
 }
 \value{
-A ggplot object
+A ggplot object.
 }
 \description{
-Plot confusion matrix as a heatmap (ggplot2)
+Creates a heatmap visualization of a confusion matrix.
+Optionally normalizes each row so that each true-label row sums to 1.
+}
+\examples{
+\donttest{
+cm <- table(True = c(0, 0, 1, 1), Pred = c(0, 1, 1, 1))
+p <- plot_confusion_matrix(cm, row_normalize = FALSE)
+p
+}
+
 }

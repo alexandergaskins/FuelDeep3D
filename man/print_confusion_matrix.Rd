@@ -7,8 +7,16 @@
 print_confusion_matrix(cm)
 }
 \arguments{
-\item{cm}{Confusion matrix (table)}
+\item{cm}{Confusion matrix (table or matrix).}
+}
+\value{
+Invisibly returns the printed data.frame.
 }
 \description{
-Pretty-print confusion matrix
+Converts a confusion matrix to a data.frame and prints it.
+}
+\examples{
+cm <- table(True = c(0, 0, 1, 1), Pred = c(0, 1, 1, 1))
+print_confusion_matrix(cm)
+
 }

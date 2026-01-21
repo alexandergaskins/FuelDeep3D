@@ -7,16 +7,34 @@
 evaluate_single_las(las, truth_col = "label", pred_col = "Classification")
 }
 \arguments{
-\item{las}{LAS object containing both truth and prediction fields}
+\item{las}{A \code{lidR::LAS} object containing both truth and prediction fields.}
 
-\item{truth_col}{Name of the ground-truth label field (default = "label")}
+\item{truth_col}{Character. Name of the ground-truth label field (default = "label").}
 
-\item{pred_col}{Name of the predicted label field (default = "Classification")}
+\item{pred_col}{Character. Name of the predicted label field (default = "Classification").}
 }
 \value{
-list with confusion matrix, accuracy, precision, recall, F1
+A list with:
+\itemize{
+\item \code{confusion} / \code{confusion_matrix}: confusion matrix
+\item \code{accuracy}: overall accuracy
+\item \code{precision}, \code{recall}, \code{f1}: per-class metrics
+}
 }
 \description{
 Computes confusion matrix, accuracy, and per-class precision/recall/F1
-from one LAS file that contains both truth and prediction fields.
+from one LAS object that contains both truth and prediction fields.
+}
+\examples{
+\donttest{
+library(lidR)
+las <- readLAS(system.file("extdata", "las", "tree2.laz", package = "FuelDeep3D"))
+if (!lidR::is.empty(las)) {
+  # Example-only: create a dummy truth column from Classification
+  las@data$label <- as.integer(las@data$Classification)
+  res <- evaluate_single_las(las, truth_col = "label", pred_col = "Classification")
+  res$accuracy
+}
+}
+
 }

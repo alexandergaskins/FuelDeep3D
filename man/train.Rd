@@ -7,13 +7,33 @@
 train(cfg, setup_env = FALSE)
 }
 \arguments{
-\item{cfg}{list from config()}
+\item{cfg}{A list created by \code{\link[=config]{config()}}.}
 
-\item{setup_env}{logical; set TRUE to create/use the package venv}
+\item{setup_env}{Logical; if \code{TRUE}, calls \code{\link[=py_setup]{py_setup()}} to create/use a venv.}
 }
 \value{
-list(best_oa, best_epoch, ckpt_path)
+A list with training outputs (e.g., best metrics and checkpoint path),
+returned from the Python trainer.
 }
 \description{
-Train the FuelDeep3D model (auto-preprocess if NPZ tiles are missing)
+This function calls the Python training pipeline shipped in
+\code{inst/extdata/python}. Training requires a working Python environment and
+the required Python dependencies (e.g., torch).
+}
+\examples{
+\dontrun{
+library(FuelDeep3D)
+
+cfg <- config(
+  las_path  = system.file("extdata", "las", "tree2.laz", package = "FuelDeep3D"),
+  out_dir   = file.path(tempdir(), "FuelDeep3D_tiles"),
+  epochs    = 2,
+  batch_size = 8,
+  learning_rate = 1e-3
+)
+
+# Train (requires Python + torch + extdata/python scripts)
+res <- train(cfg, setup_env = FALSE)
+res
+}
 }

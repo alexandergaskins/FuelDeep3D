@@ -2,7 +2,7 @@
 % Please edit documentation in R/py_deps.R
 \name{ensure_py_env}
 \alias{ensure_py_env}
-\title{Ensure a Conda environment and Python deps for FuelDeep3D}
+\title{Ensure a Conda environment and Python dependencies for FuelDeep3D}
 \usage{
 ensure_py_env(
   envname = "pointnext",
@@ -11,26 +11,34 @@ ensure_py_env(
 )
 }
 \arguments{
-\item{envname}{Name of the Conda environment to use/create.
-Defaults to \code{"pointnext"}.}
+\item{envname}{Name of the Conda environment to use/create. Default: \code{"pointnext"}.}
 
-\item{python_version}{Python version to use when creating the env
-(ignored if env already exists). Default: \code{"3.10"}.}
+\item{python_version}{Python version to use when creating the env (ignored if env already exists).
+Default: \code{"3.10"}.}
 
-\item{reinstall}{Logical; if \code{TRUE}, always reinstall Python deps
-even if key modules are already present. Default: \code{FALSE}.}
+\item{reinstall}{Logical; if \code{TRUE}, always reinstall Python deps even if key modules are already present.
+Default: \code{FALSE}.}
 }
 \value{
-Invisibly returns \code{TRUE} if the environment exists/was created
-and is ready to use.
+Invisibly returns \code{TRUE} when the environment is ready and activated.
 }
 \description{
-This helper will:
+This helper:
 \enumerate{
-\item Check if the Conda env exists; if not, create it with the requested
-Python version.
-\item Check whether key Python modules are importable from that env.
-If any are missing, it installs the full dependency set via pip.
-\item Activate the env for the current R session via \code{reticulate::use_condaenv()}.
+\item Checks whether a Conda environment exists; if not, creates it with the requested Python version.
+\item Installs Python dependencies (via pip) when missing (or always when \code{reinstall = TRUE}).
+\item Activates the environment for the current R session using \code{\link[reticulate:use_python]{reticulate::use_condaenv()}}.
 }
+}
+\examples{
+\dontrun{
+# Requires Conda and an internet connection
+ensure_py_env(envname = "pointnext", python_version = "3.10")
+
+# Confirm which Python reticulate is using:
+reticulate::py_config()
+}
+}
+\seealso{
+\code{\link[=install_py_deps]{install_py_deps()}}, \code{\link[reticulate:conda-tools]{reticulate::conda_create()}}, \code{\link[reticulate:use_python]{reticulate::use_condaenv()}}
 }

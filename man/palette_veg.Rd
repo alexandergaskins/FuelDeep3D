@@ -6,6 +6,15 @@
 \usage{
 palette_veg()
 }
+\value{
+A named character vector of colors (names are class IDs as strings).
+}
 \description{
-Default vegetation color palette
+Returns a named character vector mapping class IDs to colors.
+Useful for consistent coloring of point classes in plots.
+}
+\examples{
+pal <- palette_veg()
+pal
+
 }

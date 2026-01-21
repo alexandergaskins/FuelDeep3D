@@ -2,8 +2,7 @@
 % Please edit documentation in R/config.r
 \name{config}
 \alias{config}
-\title{Default config
-Create model configuration}
+\title{Create a FuelDeep3D configuration}
 \usage{
 config(
   las_path = system.file("extdata", "trees.las", package = "FuelDeep3D"),
@@ -32,54 +31,85 @@ config(
 )
 }
 \arguments{
-\item{las_path}{Path to input LAS file}
+\item{las_path}{Path to an input LAS/LAZ file.}
 
-\item{out_dir}{Directory where training tiles are saved}
+\item{out_dir}{Directory where training tiles will be written.}
 
-\item{out_pred_dir}{Directory where predictions are written}
+\item{out_pred_dir}{Directory where prediction outputs will be written.}
 
-\item{model_path}{Path to pre-trained .pth model}
+\item{model_path}{Path to a pre-trained \code{.pth} model checkpoint.}
 
-\item{device}{Device to use ("cpu" or "cuda")}
+\item{device}{Device to use (\code{"cpu"} or \code{"cuda"}). If \code{NULL}, the Python
+backend will choose automatically.}
 
-\item{block_size}{Tile size in meters}
+\item{block_size}{Tile size in meters.}
 
-\item{stride}{Overlap stride}
+\item{stride}{Overlap stride in meters.}
 
-\item{sample_n}{Number of points sampled per tile}
+\item{sample_n}{Number of points sampled per tile.}
 
-\item{repeat_per_tile}{Number of augmentations per tile}
+\item{repeat_per_tile}{Number of augmentations per tile.}
 
-\item{min_pts_tile}{Minimum number of points to keep a tile}
+\item{min_pts_tile}{Minimum number of points required to keep a tile.}
 
-\item{val_split}{Fraction for validation split}
+\item{val_split}{Fraction of tiles used for validation.}
 
-\item{test_split}{Fraction for test split}
+\item{test_split}{Fraction of tiles used for testing.}
 
-\item{seed}{Random seed}
+\item{seed}{Random seed.}
 
-\item{batch_size}{Batch size for training}
+\item{batch_size}{Batch size for training.}
 
-\item{epochs}{Number of training epochs}
+\item{epochs}{Number of training epochs.}
 
-\item{learning_rate}{Optimizer learning rate}
+\item{learning_rate}{Optimizer learning rate.}
 
-\item{weight_decay}{L2 regularization strength}
+\item{weight_decay}{L2 regularization strength.}
 
-\item{cell_size}{Grid cell size for height normalization}
+\item{cell_size}{Grid cell size (meters) used for height normalization.}
 
-\item{quantile}{Quantile threshold used in metrics}
+\item{quantile}{Quantile threshold used in metrics.}
 
-\item{num_classes}{Number of segmentation classes}
+\item{num_classes}{Number of segmentation classes. Supported values are 3
+or 4. If 4, FuelDeep3D can add a ground class using CSF post-processing.}
 
-\item{csf_args}{Additional arguments passed to RCSF::csf()}
+\item{csf_args}{A named list of arguments passed to \code{RCSF::csf()} when
+\code{num_classes = 4}.}
 
-\item{delete_tiles_after_train}{Whether to delete generated tiles after training}
+\item{delete_tiles_after_train}{Logical; if \code{TRUE}, delete generated tiles
+after training completes.}
 }
 \value{
-A list containing all configuration parameters
+A named list containing all configuration parameters.
 }
 \description{
-Default config
-Create model configuration
+Create a list of configuration parameters used by FuelDeep3D functions
+such as \code{\link[=train]{train()}} and \code{\link[=predict]{predict()}}.
+}
+\examples{
+# Minimal config (does not require any external files)
+cfg <- config(
+  las_path = "dummy.las",
+  out_dir = tempdir(),
+  out_pred_dir = tempdir(),
+  model_path = "dummy.pth",
+  num_classes = 3
+)
+names(cfg)
+cfg$num_classes
+
+# Validate allowed values
+try(config(las_path="a.las", model_path="m.pth", num_classes = 5))
+
+\dontrun{
+# Typical usage with real files (requires LAS/LAZ and a model checkpoint)
+cfg <- config(
+  las_path = "path/to/input.laz",
+  out_dir = "tiles_out",
+  out_pred_dir = "pred_out",
+  model_path = "path/to/best_model.pth",
+  num_classes = 3
+)
+}
+
 }

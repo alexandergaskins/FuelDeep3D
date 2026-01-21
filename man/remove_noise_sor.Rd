@@ -7,27 +7,34 @@
 remove_noise_sor(las, height_thresh = 5, k = 20, zscore = 2.5)
 }
 \arguments{
-\item{las}{A LAS object.}
+\item{las}{A \code{lidR::LAS} object.}
 
 \item{height_thresh}{Numeric. Height (meters) above which filtering is applied.}
 
 \item{k}{Integer. Number of nearest neighbors.}
 
-\item{zscore}{Numeric. Standard deviation multiplier.}
+\item{zscore}{Numeric. Standard deviation multiplier controlling outlier rejection.}
 }
 \value{
-A filtered LAS object.
+A filtered \code{lidR::LAS} object.
 }
 \description{
-Applies a k-nearest-neighbor–based Statistical Outlier Removal (SOR)
-filter to points above a user-defined height threshold. Points below
-the threshold are preserved.
+Applies a k-nearest-neighbor Statistical Outlier Removal (SOR) filter
+to points above a user-defined height threshold. Points below the
+threshold are preserved.
 }
 \examples{
-\dontrun{
+\donttest{
 library(lidR)
-las <- readLAS("trees.laz")
-las_clean <- remove_noise_sor(las, height_thresh = 5, k = 20, zscore = 2.5)
+las <- readLAS(system.file("extdata", "las", "tree2.laz", package = "FuelDeep3D"))
+if (!lidR::is.empty(las)) {
+  # keep the example fast by working on a small subset if the file is large
+  n <- lidR::npoints(las)
+  las_small <- las[seq_len(min(5000, n))]
+  las_clean <- remove_noise_sor(las_small, height_thresh = 5, k = 10, zscore = 2.5)
+  lidR::npoints(las_small)
+  lidR::npoints(las_clean)
+}
 }
 
 }

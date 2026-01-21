@@ -2,17 +2,63 @@
 % Please edit documentation in R/ground_csf.R
 \name{add_ground_csf}
 \alias{add_ground_csf}
-\title{Add ground as class 3 using CSF after FuelDeep3D prediction}
+\title{Add a ground class using CSF after FuelDeep3D prediction}
 \usage{
 add_ground_csf(in_las, out_las, csf_args = list())
 }
 \arguments{
-\item{in_las}{LAS/LAZ with FuelDeep3D predictions in Classification (0,1,2)}
+\item{in_las}{Character. Path to an input \code{.las} or \code{.laz} file that
+already contains FuelDeep3D predictions in the \code{Classification} field.}
 
-\item{out_las}{Output LAS/LAZ with ground set to class 3}
+\item{out_las}{Character. Path to write the output \code{.las} or \code{.laz}
+file. Ground points will be set to class \code{3}.}
 
-\item{csf_args}{list of arguments passed to lidR::csf()}
+\item{csf_args}{List. Arguments forwarded to \code{lidR::csf()} to tune the
+CSF algorithm (e.g., \code{rigidness}, \code{cloth_resolution},
+\code{time_step}, \code{class_threshold}).}
+}
+\value{
+Invisibly returns \code{out_las} (the output file path).
 }
 \description{
-Add ground as class 3 using CSF after FuelDeep3D prediction
+After FuelDeep3D writes predicted labels into the LAS \code{Classification}
+field (typically classes 0/1/2), this function runs Cloth Simulation Filtering
+(CSF) ground detection and assigns detected ground points to class \code{3}.
+Non-ground points keep their original predicted classes.
+}
+\details{
+Internally, heights are normalized (via \code{lidR::normalize_height()})
+before running CSF.
+
+Requirements:
+\itemize{
+\item \pkg{lidR} for reading/writing LAS and running CSF ground classification.
+\item \pkg{RCSF} provides the CSF implementation used by \code{lidR::csf()}.
+}
+
+Output classes:
+\itemize{
+\item \code{0,1,2} are preserved from the original FuelDeep3D predictions.
+\item \code{3} is assigned to points classified as ground by CSF.
+}
+}
+\examples{
+\dontrun{
+library(FuelDeep3D)
+
+in_file <- system.file("extdata", "las", "tree2.laz", package = "FuelDeep3D")
+out_file <- file.path(tempdir(), "tree2_ground.laz")
+
+add_ground_csf(
+  in_las  = in_file,
+  out_las = out_file,
+  csf_args = list(
+    rigidness = 4,
+    cloth_resolution = 0.25,
+    time_step = 0.65,
+    class_threshold = 0.05
+  )
+)
+}
+
 }

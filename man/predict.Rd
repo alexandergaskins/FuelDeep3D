@@ -2,8 +2,7 @@
 % Please edit documentation in R/predict.r
 \name{predict}
 \alias{predict}
-\title{Run prediction on cfg$las_path and write output LAS
-If cfg$num_classes == 4, add ground using CSF automatically.}
+\title{Predict fuel classes for a LAS/LAZ file using a pre-trained model}
 \usage{
 predict(
   cfg,
@@ -13,18 +12,41 @@ predict(
 )
 }
 \arguments{
-\item{cfg}{list from config()}
+\item{cfg}{A configuration list created by \code{\link[=config]{config()}}.}
 
-\item{mode}{"overwrite" or "extra"}
+\item{mode}{Character. \code{"overwrite"} replaces the LAS \code{Classification} values with
+model predictions; \code{"extra"} keeps original classification and adds a new attribute
+for predictions (behavior depends on the Python writer).}
 
-\item{setup_env}{logical; FALSE if you already have Python env}
+\item{setup_env}{Logical. If \code{TRUE}, calls \code{\link[=py_setup]{py_setup()}} (or your env setup helper)
+before importing Python modules. Default: \code{FALSE}.}
 
-\item{csf_args}{list passed to add_ground_csf() if num_classes == 4}
+\item{csf_args}{List of arguments passed to \code{\link[=add_ground_csf]{add_ground_csf()}} when \code{cfg$num_classes == 4}.}
 }
 \value{
-path to output LAS
+A character string giving the path to the output LAS/LAZ file.
 }
 \description{
-Run prediction on cfg$las_path and write output LAS
-If cfg$num_classes == 4, add ground using CSF automatically.
+Runs FuelDeep3D inference on \code{cfg$las_path} using the Python model shipped with the
+package (via \code{reticulate}). Predictions are written to a new LAS/LAZ file.
+}
+\details{
+If \code{cfg$num_classes == 4}, this function additionally runs CSF-based ground detection
+via \code{\link[=add_ground_csf]{add_ground_csf()}} and writes a final 4-class LAS/LAZ where ground points are
+assigned class \code{3}.
+}
+\examples{
+\dontrun{
+library(FuelDeep3D)
+
+cfg <- config(
+  las_path     = system.file("extdata", "las", "tree2.laz", package = "FuelDeep3D"),
+  out_pred_dir = tempdir(),
+  model_path   = system.file("extdata", "model", "best_model.pth", package = "FuelDeep3D"),
+  num_classes  = 3
+)
+
+out_las <- predict(cfg, mode = "overwrite", setup_env = FALSE)
+out_las
+}
 }
