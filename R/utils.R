@@ -67,30 +67,30 @@ plot_las_3d <- function(las,
          call. = FALSE)
   }
   stopifnot(inherits(las, "LAS"))
-
+  
   # ---- HARD CRAN GUARD ----
   if (identical(Sys.getenv("_R_CHECK_PACKAGE_NAME_"), "FuelDeep3D")) {
     warning("Skipping rgl visualization during R CMD check.")
     return(invisible(NULL))
   }
-
+  
   if (!requireNamespace("rgl", quietly = TRUE)) {
     warning("Package 'rgl' is not installed. Install it to enable 3D plotting.")
     return(invisible(NULL))
   }
-
+  
   rgl::open3d()
   rgl::title3d(title)
-
+  
   xyz <- las@data[, c("X", "Y", "Z"), drop = FALSE]
   cls <- as.character(las@data$Classification)
-
+  
   rgl::points3d(
     xyz,
     col  = palette[cls],
     size = size
   )
-
+  
   invisible(NULL)
 }
 
@@ -116,10 +116,10 @@ plot_las_3d <- function(las,
 #' library(lidR)
 #' las <- readLAS(system.file("extdata", "las", "tree2.laz", package = "FuelDeep3D"))
 #' if (!lidR::is.empty(las)) {
-#'   # keep the example fast by working on a small subset if the file is large
-#'   n <- lidR::npoints(las)
-#'   las_small <- las[seq_len(min(5000, n))]
-#'   las_clean <- remove_noise_sor(las_small, height_thresh = 5, k = 10, zscore = 2.5)
+#'   # Work on a subset, but make sure we have enough points above threshold
+#'   las_small <- las[seq_len(min(20000, lidR::npoints(las)))]
+#'   # Lower threshold to ensure enough "high" points exist in the subset
+#'   las_clean <- remove_noise_sor(las_small, height_thresh = 1, k = 10, zscore = 2.5)
 #'   lidR::npoints(las_small)
 #'   lidR::npoints(las_clean)
 #' }
@@ -138,10 +138,10 @@ remove_noise_sor <- function(las,
     stop("Package 'dbscan' is required. Install it with install.packages('dbscan').",
          call. = FALSE)
   }
-
+  
   stopifnot(inherits(las, "LAS"))
   if (lidR::is.empty(las)) return(las)
-
+  
   if (!is.numeric(height_thresh) || length(height_thresh) != 1 || height_thresh < 0) {
     stop("height_thresh must be a single non-negative numeric value.", call. = FALSE)
   }
@@ -151,27 +151,57 @@ remove_noise_sor <- function(las,
   if (!is.numeric(zscore) || length(zscore) != 1 || zscore <= 0) {
     stop("zscore must be a single positive numeric value.", call. = FALSE)
   }
-
-  # Split points
+  
+  # ---- Split points ----
   high_pts <- las[las$Z > height_thresh]
   low_pts  <- las[las$Z <= height_thresh]
-
-  if (lidR::npoints(high_pts) < k) return(las)
-
-  # kNN distances in XYZ space
+  
+  # If nothing to filter, return original
+  if (lidR::is.empty(high_pts)) return(las)
+  
+  # ---- Build XYZ + drop non-finite rows (CRAN-safe guard) ----
   xyz <- cbind(high_pts$X, high_pts$Y, high_pts$Z)
-  knn_dist <- dbscan::kNNdist(xyz, k = k)
-  d_mean <- rowMeans(knn_dist)
-
+  ok <- is.finite(xyz[, 1]) & is.finite(xyz[, 2]) & is.finite(xyz[, 3])
+  
+  if (!all(ok)) {
+    xyz <- xyz[ok, , drop = FALSE]
+    high_pts <- high_pts[ok]
+  }
+  
+  # After cleaning, ensure enough points remain for kNN
+  n <- nrow(xyz)
+  if (is.null(n) || n < 2) return(las)
+  
+  # dbscan::kNNdist requires k < n (in practice); cap k safely
+  k_use <- min(as.integer(k), n - 1L)
+  if (k_use < 1L) return(las)
+  
+  # ---- kNN distances ----
+  knn_dist <- dbscan::kNNdist(xyz, k = k_use)
+  
+  # kNNdist can return a vector in edge cases -> handle both
+  if (is.null(dim(knn_dist))) {
+    d_mean <- as.numeric(knn_dist)
+  } else {
+    d_mean <- rowMeans(knn_dist)
+  }
+  
+  # If something went weird, fail safe
+  if (length(d_mean) == 0L || any(!is.finite(d_mean))) return(las)
+  
   mu <- mean(d_mean)
   sigma <- stats::sd(d_mean)
-
-  if (!is.finite(sigma) || sigma == 0) return(las)
-
+  
+  if (!is.finite(sigma) || sigma <= 0) return(las)
+  
   keep <- d_mean < (mu + zscore * sigma)
+  
+  # If keep is invalid length (shouldn't happen, but be defensive)
+  if (length(keep) != lidR::npoints(high_pts)) return(las)
+  
   high_clean <- high_pts[keep]
-
-  # Combine back
+  
+  # Combine back (preserve low points)
   out <- rbind(low_pts, high_clean)
   out
 }
@@ -197,11 +227,11 @@ metrics_from_cm <- function(cm) {
   precision <- diag(cm) / colSums(cm)
   recall    <- diag(cm) / rowSums(cm)
   f1        <- 2 * precision * recall / (precision + recall)
-
+  
   precision[!is.finite(precision)] <- NA_real_
   recall[!is.finite(recall)]       <- NA_real_
   f1[!is.finite(f1)]               <- NA_real_
-
+  
   list(precision = precision, recall = recall, f1 = f1)
 }
 
@@ -241,28 +271,28 @@ evaluate_single_las <- function(las,
     stop("Package 'lidR' is required. Install it with install.packages('lidR').",
          call. = FALSE)
   }
-
+  
   stopifnot(inherits(las, "LAS"))
-
+  
   if (!(truth_col %in% names(las@data))) {
     stop(paste("Truth column", shQuote(truth_col), "not found in LAS."), call. = FALSE)
   }
   if (!(pred_col %in% names(las@data))) {
     stop(paste("Prediction column", shQuote(pred_col), "not found in LAS."), call. = FALSE)
   }
-
+  
   true_labels <- as.integer(las@data[[truth_col]])
   pred_labels <- as.integer(las@data[[pred_col]])
-
+  
   if (length(true_labels) != length(pred_labels)) {
     stop("Truth and prediction vectors have different lengths.", call. = FALSE)
   }
-
+  
   cm  <- table(True = true_labels, Pred = pred_labels)
   acc <- sum(diag(cm)) / sum(cm)
-
+  
   m <- metrics_from_cm(cm)
-
+  
   list(
     confusion = cm,
     confusion_matrix = cm,
@@ -306,33 +336,33 @@ evaluate_two_las <- function(truth_las,
     stop("Package 'lidR' is required. Install it with install.packages('lidR').",
          call. = FALSE)
   }
-
+  
   stopifnot(inherits(truth_las, "LAS"))
   stopifnot(inherits(pred_las, "LAS"))
-
+  
   if (lidR::is.empty(truth_las) || lidR::is.empty(pred_las)) {
     stop("One of the LAS objects is empty.", call. = FALSE)
   }
-
+  
   if (!(truth_col %in% names(truth_las@data))) {
     stop(paste("Truth column", shQuote(truth_col), "not found in truth_las."), call. = FALSE)
   }
   if (!(pred_col %in% names(pred_las@data))) {
     stop(paste("Prediction column", shQuote(pred_col), "not found in pred_las."), call. = FALSE)
   }
-
+  
   if (lidR::npoints(truth_las) != lidR::npoints(pred_las)) {
     stop("LAS files are not point-wise aligned: different number of points.", call. = FALSE)
   }
-
+  
   true_labels <- as.integer(truth_las@data[[truth_col]])
   pred_labels <- as.integer(pred_las@data[[pred_col]])
-
+  
   cm  <- table(True = true_labels, Pred = pred_labels)
   acc <- sum(diag(cm)) / sum(cm)
-
+  
   m <- metrics_from_cm(cm)
-
+  
   list(
     confusion = cm,
     confusion_matrix = cm,
@@ -391,12 +421,12 @@ print_metrics_table <- function(results) {
   precision <- results$precision
   recall    <- results$recall
   f1        <- results$f1
-
+  
   if (is.null(precision) || is.null(recall) || is.null(f1)) {
     stop("results must contain precision, recall, and f1 fields (output of evaluate_* functions).",
          call. = FALSE)
   }
-
+  
   df <- data.frame(
     Class     = names(precision),
     Precision = round(as.numeric(precision), 4),
@@ -404,7 +434,7 @@ print_metrics_table <- function(results) {
     F1_Score  = round(as.numeric(f1), 4),
     stringsAsFactors = FALSE
   )
-
+  
   df <- rbind(
     df,
     data.frame(
@@ -415,7 +445,7 @@ print_metrics_table <- function(results) {
       stringsAsFactors = FALSE
     )
   )
-
+  
   rownames(df) <- NULL
   print(df)
   invisible(df)
@@ -455,19 +485,19 @@ plot_confusion_matrix <- function(cm,
     stop("Package 'ggplot2' is required. Install it with install.packages('ggplot2').",
          call. = FALSE)
   }
-
+  
   m <- as.matrix(cm)
-
+  
   # Optional row-normalization
   if (isTRUE(row_normalize)) {
     rs <- rowSums(m)
     rs[rs == 0] <- NA_real_
     m <- m / rs
   }
-
+  
   df <- as.data.frame(as.table(m))
   colnames(df) <- c("True", "Pred", "Value")
-
+  
   if (isTRUE(row_normalize)) {
     df$Label <- ifelse(is.na(df$Value), "", format(round(df$Value, digits = digits), nsmall = digits))
     fill_name <- "Proportion"
@@ -475,7 +505,7 @@ plot_confusion_matrix <- function(cm,
     df$Label <- as.character(as.integer(round(df$Value)))
     fill_name <- "Count"
   }
-
+  
   p <- ggplot2::ggplot(df, ggplot2::aes(x = Pred, y = True, fill = Value)) +
     ggplot2::geom_tile() +
     ggplot2::coord_equal() +
@@ -486,11 +516,10 @@ plot_confusion_matrix <- function(cm,
       fill = fill_name
     ) +
     ggplot2::theme_minimal()
-
+  
   if (isTRUE(show_values)) {
     p <- p + ggplot2::geom_text(ggplot2::aes(label = Label), size = 4)
   }
-
+  
   p
 }
-

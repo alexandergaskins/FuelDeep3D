@@ -28,10 +28,10 @@ threshold are preserved.
 library(lidR)
 las <- readLAS(system.file("extdata", "las", "tree2.laz", package = "FuelDeep3D"))
 if (!lidR::is.empty(las)) {
-  # keep the example fast by working on a small subset if the file is large
-  n <- lidR::npoints(las)
-  las_small <- las[seq_len(min(5000, n))]
-  las_clean <- remove_noise_sor(las_small, height_thresh = 5, k = 10, zscore = 2.5)
+  # Work on a subset, but make sure we have enough points above threshold
+  las_small <- las[seq_len(min(20000, lidR::npoints(las)))]
+  # Lower threshold to ensure enough "high" points exist in the subset
+  las_clean <- remove_noise_sor(las_small, height_thresh = 1, k = 10, zscore = 2.5)
   lidR::npoints(las_small)
   lidR::npoints(las_clean)
 }
