@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="inst/readme/logo_gif.gif" alt="Single tree segmentation output" width="100%">
+  <img src="inst/readme/banner.png" alt="Single tree segmentation output" width="100%">
 </p>
 
 [![R-hub](https://github.com/venkatasivanaga/FuelDeep3D/actions/workflows/rhub.yaml/badge.svg)](https://github.com/venkatasivanaga/FuelDeep3D/actions/workflows/rhub.yaml)
