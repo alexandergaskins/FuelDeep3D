@@ -2,7 +2,7 @@
 % Please edit documentation in R/train.r
 \name{train}
 \alias{train}
-\title{Train the FuelDeep3D model (auto-preprocess if NPZ tiles are missing)}
+\title{Train the FuelDeep3D model (build NPZ tiles if missing)}
 \usage{
 train(cfg, setup_env = FALSE)
 }
@@ -16,24 +16,58 @@ A list with training outputs (e.g., best metrics and checkpoint path),
 returned from the Python trainer.
 }
 \description{
-This function calls the Python training pipeline shipped in
-\code{inst/extdata/python}. Training requires a working Python environment and
-the required Python dependencies (e.g., torch).
+Trains the FuelDeep3D point-cloud model using the Python training pipeline shipped with
+the package (under \code{inst/extdata/python}) and executed via \pkg{reticulate}.
+If preprocessed NPZ tiles are not found in \code{file.path(cfg$out_dir, "train")},
+the function automatically runs the dataset builder to generate \code{train/val/test}
+NPZ tiles from the input LAS/LAZ before starting training.
+}
+\details{
+Training proceeds in two stages:
+\enumerate{
+\item \strong{Dataset preparation (optional):} If no \code{.npz} files are found in
+\code{cfg$out_dir/train}, the function calls the Python function
+\code{dataset.build_dataset_from_las()} to create NPZ tiles for training, validation,
+and testing. Dataset tiling behavior is controlled by fields in \code{cfg}
+(e.g., \code{block_size}, \code{stride}, \code{sample_n}, \code{repeat_per_tile},
+\code{min_pts_tile}, \code{cell_size}, \code{quantile}, splits, and \code{seed}).
+
+\item \strong{Model training:} The function calls \code{train.train_model(cfg)} in the
+shipped Python code. The returned object (e.g., best metrics and checkpoint path)
+is converted back to R with \code{reticulate::py_to_r()}.
+}
+
+\strong{Environment:} This function requires a working Python environment with the required
+dependencies installed (e.g., PyTorch). If \code{setup_env = TRUE}, it calls
+\code{\link{py_setup}} before importing Python modules.
+
+\strong{Safety during checks:} \code{train()} is intentionally disabled during
+\code{R CMD check} to avoid running long, non-deterministic computations on CRAN.
+
+\strong{Optional cleanup:} If \code{cfg$delete_tiles_after_train} is \code{TRUE},
+the generated NPZ directories \code{train/}, \code{val/}, and \code{test/} under
+\code{cfg$out_dir} are deleted after training completes.
 }
 \examples{
 \dontrun{
 library(FuelDeep3D)
+library(reticulate)
+use_condaenv("pointnext", required = TRUE)
 
 cfg <- config(
-  las_path  = system.file("extdata", "las", "tree2.laz", package = "FuelDeep3D"),
-  out_dir   = file.path(tempdir(), "FuelDeep3D_tiles"),
-  epochs    = 2,
-  batch_size = 8,
-  learning_rate = 1e-3
+  las_path     = system.file("extdata", "las", "trees.laz", package = "FuelDeep3D"),
+  out_dir      = system.file("extdata", "npz_files", package = "FuelDeep3D"),
+  out_pred_dir = system.file("extdata", "output_directory", package = "FuelDeep3D"),
+  model_path   = system.file("extdata", "model", "best_model.pth", package = "FuelDeep3D"),
+  epochs       = 2, batch_size = 16,
+  learning_rate = 1e-5, weight_decay = 1e-4,
+  block_size = 6, stride = 1, sample_n = 4096,
+  repeat_per_tile = 4, min_pts_tile = 512,
+  cell_size = 0.25, quantile = 0.05,
+  delete_tiles_after_train = True
 )
 
-# Train (requires Python + torch + extdata/python scripts)
-res <- train(cfg, setup_env = FALSE)
-res
+res <- train(cfg, setup_env = FALSE)        # trains & saves best .pth
+
 }
 }

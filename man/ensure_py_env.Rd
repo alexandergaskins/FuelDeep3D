@@ -7,38 +7,56 @@
 ensure_py_env(
   envname = "pointnext",
   python_version = "3.10",
-  reinstall = FALSE
+  reinstall = FALSE,
+  cpu_only = FALSE
 )
 }
 \arguments{
-\item{envname}{Name of the Conda environment to use/create. Default: \code{"pointnext"}.}
+\item{envname}{Name of the Conda environment to use or create.}
 
-\item{python_version}{Python version to use when creating the env (ignored if env already exists).
-Default: \code{"3.10"}.}
+\item{python_version}{Python version used when creating a new environment.
+Ignored if the environment already exists.}
 
-\item{reinstall}{Logical; if \code{TRUE}, always reinstall Python deps even if key modules are already present.
-Default: \code{FALSE}.}
+\item{reinstall}{Logical. If \code{TRUE}, forces dependency installation even if
+key modules appear to be installed. Default: \code{FALSE}.}
+
+\item{cpu_only}{Logical. If \code{TRUE}, installs CPU-only PyTorch wheels.
+If \code{FALSE} (default), installs CUDA wheels (cu121) via the PyTorch extra index URL.
+CUDA wheels require a compatible NVIDIA GPU + drivers.}
 }
 \value{
-Invisibly returns \code{TRUE} when the environment is ready and activated.
+Invisibly returns \code{TRUE} when the environment exists and has been
+activated for the current R session.
 }
 \description{
-This helper:
-\enumerate{
-\item Checks whether a Conda environment exists; if not, creates it with the requested Python version.
-\item Installs Python dependencies (via pip) when missing (or always when \code{reinstall = TRUE}).
-\item Activates the environment for the current R session using \code{\link[reticulate:use_python]{reticulate::use_condaenv()}}.
+Ensures a Conda environment exists and installs the Python dependencies required
+by FuelDeep3D into that environment. The environment is then activated for the
+current R session using \code{reticulate}.
 }
+\details{
+This helper performs the following steps:
+\enumerate{
+\item Detects a Conda installation using \code{reticulate::conda_binary()}.
+\item Creates the requested environment (if missing) using the requested Python version.
+\item Installs Python packages via \code{\link{install_py_deps}}.
+\item Activates the environment for the current R session with
+\code{reticulate::use_condaenv(..., required = TRUE)}.
+}
+
+Use \code{cpu_only = TRUE} on machines without an NVIDIA GPU / CUDA drivers.
+If you change \code{cpu_only} after a previous install, use \code{reinstall = TRUE}
+to force reinstalling dependencies.
 }
 \examples{
 \dontrun{
 # Requires Conda and an internet connection
-ensure_py_env(envname = "pointnext", python_version = "3.10")
+ensure_py_env(envname = "pointnext", python_version = "3.10", cpu_only = FALSE)
+
+# CPU-only install (recommended on most laptops / no NVIDIA GPU)
+ensure_py_env(envname = "pointnext", python_version = "3.10", cpu_only = TRUE)
 
 # Confirm which Python reticulate is using:
 reticulate::py_config()
 }
-}
-\seealso{
-\code{\link[=install_py_deps]{install_py_deps()}}, \code{\link[reticulate:conda-tools]{reticulate::conda_create()}}, \code{\link[reticulate:use_python]{reticulate::use_condaenv()}}
+
 }

@@ -33,22 +33,22 @@ config(
 \arguments{
 \item{las_path}{Path to an input LAS/LAZ file.}
 
-\item{out_dir}{Directory where training tiles will be written.}
+\item{out_dir}{Directory where training tiles (NPZ) will be written.}
 
 \item{out_pred_dir}{Directory where prediction outputs will be written.}
 
-\item{model_path}{Path to a pre-trained \code{.pth} model checkpoint.}
+\item{model_path}{Path to a \code{.pth} model checkpoint.}
 
 \item{device}{Device to use (\code{"cpu"} or \code{"cuda"}). If \code{NULL}, the Python
 backend will choose automatically.}
 
-\item{block_size}{Tile size in meters.}
+\item{block_size}{Tile size (meters).}
 
-\item{stride}{Overlap stride in meters.}
+\item{stride}{Overlap stride (meters).}
 
 \item{sample_n}{Number of points sampled per tile.}
 
-\item{repeat_per_tile}{Number of augmentations per tile.}
+\item{repeat_per_tile}{Number of repeated samples/augmentations per tile.}
 
 \item{min_pts_tile}{Minimum number of points required to keep a tile.}
 
@@ -56,7 +56,7 @@ backend will choose automatically.}
 
 \item{test_split}{Fraction of tiles used for testing.}
 
-\item{seed}{Random seed.}
+\item{seed}{Random seed used for splitting/sampling.}
 
 \item{batch_size}{Batch size for training.}
 
@@ -64,52 +64,76 @@ backend will choose automatically.}
 
 \item{learning_rate}{Optimizer learning rate.}
 
-\item{weight_decay}{L2 regularization strength.}
+\item{weight_decay}{L2 regularization strength (weight decay).}
 
-\item{cell_size}{Grid cell size (meters) used for height normalization.}
+\item{cell_size}{Grid cell size (meters) used for height normalization/statistics.}
 
-\item{quantile}{Quantile threshold used in metrics.}
+\item{quantile}{Quantile threshold used in metrics/filters in the Python pipeline.}
 
-\item{num_classes}{Number of segmentation classes. Supported values are 3
-or 4. If 4, FuelDeep3D can add a ground class using CSF post-processing.}
+\item{num_classes}{Number of output classes. Supported values are \code{3} or \code{4}.
+If \code{4}, ground can be added using CSF post-processing.}
 
-\item{csf_args}{A named list of arguments passed to \code{RCSF::csf()} when
-\code{num_classes = 4}.}
+\item{csf_args}{Named list of arguments forwarded to \code{RCSF::csf()} inside
+\code{\link{add_ground_csf}} (used when \code{num_classes = 4}).}
 
-\item{delete_tiles_after_train}{Logical; if \code{TRUE}, delete generated tiles
-after training completes.}
+\item{delete_tiles_after_train}{Logical; if \code{TRUE}, delete generated NPZ tiles
+after training completes (see \code{\link{train}}).}
 }
 \value{
 A named list containing all configuration parameters.
 }
 \description{
-Create a list of configuration parameters used by FuelDeep3D functions
-such as \code{\link[=train]{train()}} and \code{\link[=predict]{predict()}}.
+Constructs a named list of parameters used throughout FuelDeep3D for dataset
+tiling, model training, and inference. The returned configuration is consumed
+by \code{\link{train}} (to build NPZ tiles and train the Python model) and
+\code{\link{predict}} (to run inference and write a predicted LAS/LAZ).
 }
-\examples{
-# Minimal config (does not require any external files)
-cfg <- config(
-  las_path = "dummy.las",
-  out_dir = tempdir(),
-  out_pred_dir = tempdir(),
-  model_path = "dummy.pth",
-  num_classes = 3
-)
-names(cfg)
-cfg$num_classes
+\details{
+The configuration groups parameters into a few logical sections:
 
-# Validate allowed values
-try(config(las_path="a.las", model_path="m.pth", num_classes = 5))
-
-\dontrun{
-# Typical usage with real files (requires LAS/LAZ and a model checkpoint)
-cfg <- config(
-  las_path = "path/to/input.laz",
-  out_dir = "tiles_out",
-  out_pred_dir = "pred_out",
-  model_path = "path/to/best_model.pth",
-  num_classes = 3
-)
+\strong{I/O paths}
+\itemize{
+\item \code{las_path}: input LAS/LAZ file used for preprocessing, training, or inference.
+\item \code{out_dir}: directory where NPZ tiles will be written (typically contains
+\code{train/}, \code{val/}, and \code{test/} subfolders).
+\item \code{out_pred_dir}: directory where predicted LAS/LAZ outputs are written.
+\item \code{model_path}: path to a \code{.pth} model checkpoint used by \code{\link{predict}}.
 }
 
+\strong{Tiling / sampling (Python dataset builder)}
+\itemize{
+\item \code{block_size} and \code{stride} control the spatial tiling grid (meters).
+\item \code{sample_n} sets the number of points sampled per tile.
+\item \code{repeat_per_tile} controls how many repeated samples/augmentations are generated per tile.
+\item \code{min_pts_tile} drops tiles with too few points.
+\item \code{val_split}, \code{test_split}, and \code{seed} control dataset splitting.
+\item \code{cell_size} and \code{quantile} are forwarded to the Python pipeline for
+height normalization / grid-based statistics and related thresholds.
+}
+
+\strong{Training hyperparameters (Python trainer)}
+\itemize{
+\item \code{batch_size}, \code{epochs}, \code{learning_rate}, and \code{weight_decay}
+configure the optimizer and training loop in the Python trainer.
+}
+
+\strong{Device selection}
+\itemize{
+\item \code{device} can be \code{"cpu"} or \code{"cuda"}. If \code{NULL}, the Python
+backend selects CUDA when available and otherwise falls back to CPU.
+}
+
+\strong{Class handling: 3 vs 4 classes}
+\itemize{
+\item \code{num_classes = 3}: produces the model's 3-class predictions.
+\item \code{num_classes = 4}: after 3-class prediction, FuelDeep3D can add a
+ground class via CSF post-processing (see \code{\link{add_ground_csf}}).
+}
+
+\strong{Cleanup}
+\itemize{
+\item If \code{delete_tiles_after_train = TRUE}, generated NPZ tiles under
+\code{out_dir/train}, \code{out_dir/val}, and \code{out_dir/test} may be removed
+after training (see \code{\link{train}}).
+}
 }

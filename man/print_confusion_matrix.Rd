@@ -2,21 +2,63 @@
 % Please edit documentation in R/utils.R
 \name{print_confusion_matrix}
 \alias{print_confusion_matrix}
-\title{Pretty-print confusion matrix}
+\title{Print a confusion matrix (LAS/LAZ or precomputed cm)}
 \usage{
-print_confusion_matrix(cm)
+print_confusion_matrix(
+  x,
+  truth_col = "label",
+  pred_col = "Classification",
+  row_normalize = FALSE,
+  digits = 3,
+  classes = NULL,
+  class_names = NULL,
+  show_codes = TRUE,
+  drop_na = TRUE
+)
 }
 \arguments{
-\item{cm}{Confusion matrix (table or matrix).}
+\item{x}{A confusion matrix (table/matrix) OR a \code{lidR::LAS} object.}
+
+\item{truth_col}{Character. Truth label column name (used when \code{x} is LAS).}
+
+\item{pred_col}{Character. Prediction column name (used when \code{x} is LAS).}
+
+\item{row_normalize}{Logical. If TRUE, each row is converted to proportions (rows sum to 1).}
+
+\item{digits}{Integer. Number of decimal places to show when \code{row_normalize = TRUE}.}
+
+\item{classes}{Optional integer vector of expected class IDs (e.g. \code{0:2}).
+Keeps matrix shape stable even if some classes are missing.}
+
+\item{class_names}{Optional mapping for nicer labels (named or unnamed).}
+
+\item{show_codes}{Logical. If \code{TRUE} (default), labels display like \code{"0 (Ground)"}.}
+
+\item{drop_na}{Logical. Drop rows where truth/pred is NA/Inf (used when \code{x} is LAS).}
 }
 \value{
 Invisibly returns the printed data.frame.
 }
 \description{
-Converts a confusion matrix to a data.frame and prints it.
+Prints a confusion matrix as a readable table. You can pass either:
+\itemize{
+\item a precomputed confusion matrix \code{table/matrix}, OR
+\item a \code{lidR::LAS} object (then \code{truth_col} and \code{pred_col} are used to build the matrix).
+}
 }
 \examples{
-cm <- table(True = c(0, 0, 1, 1), Pred = c(0, 1, 1, 1))
-print_confusion_matrix(cm)
+\dontrun{
+library(lidR)
+las <- readLAS("C:/Users/vs.naga/Documents/Github/FuelDeep3D/inst/extdata/las/trees.laz")
 
+print_confusion_matrix(
+  las,
+  truth_col = "label",
+  pred_col  = "Classification",
+  classes   = 0:2,
+  class_names = c("0"="Ground","1"="Branch","2"="Leaves"),
+    row_normalize = TRUE,
+    digits = 3
+)
+}
 }

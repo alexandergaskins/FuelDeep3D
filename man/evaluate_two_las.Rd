@@ -2,41 +2,67 @@
 % Please edit documentation in R/utils.R
 \name{evaluate_two_las}
 \alias{evaluate_two_las}
-\title{Evaluate two LAS files (truth vs prediction)}
+\title{Evaluate predictions stored in two LAS/LAZ objects}
 \usage{
 evaluate_two_las(
   truth_las,
   pred_las,
   truth_col = "label",
-  pred_col = "Classification"
+  pred_col = "Classification",
+  classes = NULL,
+  drop_na = TRUE,
+  class_names = NULL,
+  show_codes = TRUE
 )
 }
 \arguments{
-\item{truth_las}{A \code{lidR::LAS} object containing ground-truth labels.}
+\item{truth_las}{A \code{lidR::LAS} containing ground-truth labels.}
 
-\item{pred_las}{A \code{lidR::LAS} object containing predicted labels.}
+\item{pred_las}{A \code{lidR::LAS} containing predicted labels.}
 
-\item{truth_col}{Character. Name of truth label field in \code{truth_las} (default = "label").}
+\item{truth_col}{Character. Name of the ground-truth label column (default \code{"label"}).}
 
-\item{pred_col}{Character. Name of prediction field in \code{pred_las} (default = "Classification").}
+\item{pred_col}{Character. Name of the prediction column (default \code{"Classification"}).}
+
+\item{classes}{Optional integer vector of expected class IDs (e.g. \code{0:2}, \code{0:3}).
+If \code{NULL}, inferred from observed truth and pred values.}
+
+\item{drop_na}{Logical. If \code{TRUE} (default), rows with NA/Inf in truth or pred are dropped.}
+
+\item{class_names}{Optional class name mapping. Either:
+\itemize{
+\item Named: \code{c("0"="Ground","1"="Branch","2"="Leaves")}
+\item Unnamed length-K: \code{c("Ground","Branch","Leaves")} (must match \code{classes})
+}}
+
+\item{show_codes}{Logical. If \code{TRUE} (default), class labels display like \code{"0 (Ground)"}.}
 }
 \value{
-A list with confusion matrix, accuracy, precision, recall, and F1.
+A list containing confusion matrix and metrics.
 }
 \description{
-Computes confusion matrix, accuracy, and per-class precision/recall/F1
-using two separate LAS objects that are point-wise aligned (same number of points).
+Computes confusion matrix and metrics when ground truth and predictions come from
+two separate \code{lidR::LAS} objects.
+}
+\details{
+\strong{Important:} This assumes the LAS objects are point-wise aligned (same points,
+same order). If they are not aligned, metrics will be meaningless.
 }
 \examples{
-\donttest{
+\dontrun{
 library(lidR)
-truth <- readLAS(system.file("extdata", "las", "tree2.laz", package = "FuelDeep3D"))
-pred  <- readLAS(system.file("extdata", "las", "tree2.laz", package = "FuelDeep3D"))
-if (!lidR::is.empty(truth) && !lidR::is.empty(pred)) {
-  truth@data$label <- as.integer(truth@data$Classification)
-  res <- evaluate_two_las(truth, pred, truth_col = "label", pred_col = "Classification")
-  res$accuracy
-}
-}
+truth <- readLAS("truth.laz")
+pred  <- readLAS("predicted.laz")
 
+res <- evaluate_two_las(
+  truth, pred,
+  truth_col = "label",
+  pred_col  = "Classification",
+  classes   = 0:2,
+  class_names = c("0"="Ground","1"="Branch","2"="Leaves")
+)
+
+res$class_accuracy
+cat(sprintf("accuracy = \%.2f\%\%\n", 100 * res$accuracy))
+}
 }

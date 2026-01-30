@@ -11,7 +11,7 @@ remove_noise_sor(las, height_thresh = 5, k = 20, zscore = 2.5)
 
 \item{height_thresh}{Numeric. Height (meters) above which filtering is applied.}
 
-\item{k}{Integer. Number of nearest neighbors.}
+\item{k}{Integer. Number of nearest neighbors used by the SOR filter.}
 
 \item{zscore}{Numeric. Standard deviation multiplier controlling outlier rejection.}
 }
@@ -19,18 +19,29 @@ remove_noise_sor(las, height_thresh = 5, k = 20, zscore = 2.5)
 A filtered \code{lidR::LAS} object.
 }
 \description{
-Applies a k-nearest-neighbor Statistical Outlier Removal (SOR) filter
-to points above a user-defined height threshold. Points below the
-threshold are preserved.
+Applies a k-nearest-neighbor Statistical Outlier Removal (SOR) filter to points
+above a user-defined height threshold. Points at or below the threshold are
+preserved unchanged.
+}
+\details{
+The filter is applied only to points with \code{Z > height_thresh}.
+For each of these points, the mean distance to its \code{k} nearest neighbors
+is computed in 3D XYZ space. A point is kept if:
+\deqn{d_i < mean(d) + zscore * sd(d)}
+where \code{d_i} is the mean kNN distance for point i.
+
+To keep behavior stable and safe, \code{k} is automatically capped so that
+\code{k < n}, where \code{n} is the number of points being filtered.
+
+This function preserves the original point order by computing a global keep
+mask and subsetting once.
 }
 \examples{
 \donttest{
 library(lidR)
 las <- readLAS(system.file("extdata", "las", "tree2.laz", package = "FuelDeep3D"))
 if (!lidR::is.empty(las)) {
-  # Work on a subset, but make sure we have enough points above threshold
   las_small <- las[seq_len(min(20000, lidR::npoints(las)))]
-  # Lower threshold to ensure enough "high" points exist in the subset
   las_clean <- remove_noise_sor(las_small, height_thresh = 1, k = 10, zscore = 2.5)
   lidR::npoints(las_small)
   lidR::npoints(las_clean)

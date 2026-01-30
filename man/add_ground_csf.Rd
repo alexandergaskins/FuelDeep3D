@@ -2,51 +2,70 @@
 % Please edit documentation in R/ground_csf.R
 \name{add_ground_csf}
 \alias{add_ground_csf}
-\title{Add a ground class using CSF after FuelDeep3D prediction}
+\title{Add a ground class using CSF post-processing}
 \usage{
 add_ground_csf(in_las, out_las, csf_args = list())
 }
 \arguments{
 \item{in_las}{Character. Path to an input \code{.las} or \code{.laz} file that
-already contains FuelDeep3D predictions in the \code{Classification} field.}
+already contains FuelDeep3D predictions in the \code{Classification} attribute.}
 
-\item{out_las}{Character. Path to write the output \code{.las} or \code{.laz}
-file. Ground points will be set to class \code{3}.}
+\item{out_las}{Character. Output path for the updated \code{.las} or \code{.laz}.}
 
-\item{csf_args}{List. Arguments forwarded to \code{lidR::csf()} to tune the
-CSF algorithm (e.g., \code{rigidness}, \code{cloth_resolution},
-\code{time_step}, \code{class_threshold}).}
+\item{csf_args}{List. Named list of arguments forwarded to \code{lidR::csf()} to tune
+CSF behavior (e.g., \code{rigidness}, \code{cloth_resolution}, \code{time_step},
+\code{class_threshold}).}
 }
 \value{
 Invisibly returns \code{out_las} (the output file path).
 }
 \description{
-After FuelDeep3D writes predicted labels into the LAS \code{Classification}
-field (typically classes 0/1/2), this function runs Cloth Simulation Filtering
-(CSF) ground detection and assigns detected ground points to class \code{3}.
-Non-ground points keep their original predicted classes.
+Post-processes a FuelDeep3D-predicted LAS/LAZ by detecting ground points with
+Cloth Simulation Filtering (CSF) and assigning them to a dedicated ground class.
+This is used when converting a 3-class FuelDeep3D prediction into a 4-class output
+where ground is encoded as class \code{3}.
 }
 \details{
-Internally, heights are normalized (via \code{lidR::normalize_height()})
-before running CSF.
-
-Requirements:
-\itemize{
-\item \pkg{lidR} for reading/writing LAS and running CSF ground classification.
-\item \pkg{RCSF} provides the CSF implementation used by \code{lidR::csf()}.
+\strong{Intended workflow}
+\enumerate{
+\item Run \code{\link{predict}} with \code{mode = "overwrite"} to write model
+predictions into the LAS \code{Classification} attribute (typically classes
+\code{0}, \code{1}, \code{2}).
+\item Call \code{add_ground_csf()} to detect ground points and overwrite only
+those points to class \code{3}.
 }
 
-Output classes:
+\strong{What the function does}
 \itemize{
-\item \code{0,1,2} are preserved from the original FuelDeep3D predictions.
-\item \code{3} is assigned to points classified as ground by CSF.
+\item Reads the input LAS/LAZ from \code{in_las}.
+\item Normalizes heights with \code{lidR::normalize_height(..., lidR::knnidw())}
+so ground detection is more stable across sloped terrain and varying elevations.
+\item Builds a CSF ground-classification algorithm using \code{lidR::csf()} with
+parameters provided in \code{csf_args}.
+\item Runs \code{lidR::classify_ground()} to label ground points.
+\item Rewrites only the ground points to class \code{3}, while preserving the
+original FuelDeep3D predicted classes for non-ground points.
+\item Writes the updated LAS/LAZ to \code{out_las}.
+}
+
+\strong{Class mapping}
+\itemize{
+\item \code{0, 1, 2}: preserved from the FuelDeep3D prediction already stored in
+\code{Classification}.
+\item \code{3}: assigned to points detected as ground by CSF.
+}
+
+\strong{Dependencies}
+\itemize{
+\item \pkg{lidR} for I/O, height normalization, and ground classification.
+\item \pkg{RCSF} provides the CSF implementation used by \code{lidR::csf()}.
 }
 }
 \examples{
 \dontrun{
 library(FuelDeep3D)
 
-in_file <- system.file("extdata", "las", "tree2.laz", package = "FuelDeep3D")
+in_file  <- system.file("extdata", "las", "tree2.laz", package = "FuelDeep3D")
 out_file <- file.path(tempdir(), "tree2_ground.laz")
 
 add_ground_csf(

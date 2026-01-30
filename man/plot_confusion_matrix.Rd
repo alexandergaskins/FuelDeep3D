@@ -2,39 +2,58 @@
 % Please edit documentation in R/utils.R
 \name{plot_confusion_matrix}
 \alias{plot_confusion_matrix}
-\title{Plot confusion matrix as a heatmap (ggplot2)}
+\title{Plot a confusion matrix heatmap (ggplot2)}
 \usage{
 plot_confusion_matrix(
   cm,
+  las_name = NULL,
   title = "Confusion Matrix",
   row_normalize = FALSE,
   digits = 3,
-  show_values = TRUE
+  show_values = TRUE,
+  class_names = NULL,
+  show_codes = FALSE,
+  flip_y = TRUE
 )
 }
 \arguments{
 \item{cm}{Confusion matrix (table or matrix).}
 
+\item{las_name}{Optional character. If provided, appended to the title.}
+
 \item{title}{Character. Plot title.}
 
-\item{row_normalize}{Logical. If TRUE, normalize each row to sum to 1 (proportions).}
+\item{row_normalize}{Logical. If \code{TRUE}, normalize each row to proportions.}
 
-\item{digits}{Integer. Rounding digits for displayed values when row_normalize = TRUE.}
+\item{digits}{Integer. Rounding digits for displayed values when \code{row_normalize = TRUE}.}
 
-\item{show_values}{Logical. If TRUE, prints values inside each cell.}
+\item{show_values}{Logical. If \code{TRUE}, draw numbers in each cell.}
+
+\item{class_names}{Optional class name mapping (named or unnamed).}
+
+\item{show_codes}{Logical. If \code{TRUE}, axis labels include codes like \code{"0 (Ground)"}.}
+
+\item{flip_y}{Logical. If \code{TRUE}, show first class at the top (common confusion-matrix style).}
 }
 \value{
-A ggplot object.
+A ggplot object (invisibly).
 }
 \description{
-Creates a heatmap visualization of a confusion matrix.
-Optionally normalizes each row so that each true-label row sums to 1.
+Creates a heatmap visualization of a confusion matrix. If \code{row_normalize = TRUE},
+each row is converted to proportions so rows sum to 1.
 }
 \examples{
-\donttest{
-cm <- table(True = c(0, 0, 1, 1), Pred = c(0, 1, 1, 1))
-p <- plot_confusion_matrix(cm, row_normalize = FALSE)
-p
-}
+\dontrun{
+library(lidR)
+las <- readLAS("C:/Users/vs.naga/Documents/Github/FuelDeep3D/inst/extdata/las/trees.laz")
 
+cm <- table(True = las@data$label, Pred = las@data$Classification)
+
+plot_confusion_matrix(
+  cm,
+  row_normalize = TRUE,
+  las_name = "trees.laz",
+  class_names = c("0"="Ground","1"="Branch","2"="Leaves")
+)
+}
 }

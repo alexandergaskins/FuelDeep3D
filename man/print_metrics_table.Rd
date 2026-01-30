@@ -2,25 +2,65 @@
 % Please edit documentation in R/utils.R
 \name{print_metrics_table}
 \alias{print_metrics_table}
-\title{Pretty-print evaluation metrics table with a macro-average summary row}
+\title{Print per-class metrics and summary averages}
 \usage{
-print_metrics_table(results)
+print_metrics_table(
+  results,
+  digits = 4,
+  include_macro = TRUE,
+  include_weighted = TRUE,
+  include_overall = FALSE
+)
 }
 \arguments{
 \item{results}{List returned by \code{evaluate_single_las()} or \code{evaluate_two_las()}.}
+
+\item{digits}{Integer. Number of decimal places to round numeric metrics.}
+
+\item{include_macro}{Logical. If TRUE, include a "Macro avg" row.}
+
+\item{include_weighted}{Logical. If TRUE, include a "Weighted avg" row.}
+
+\item{include_overall}{Logical. If TRUE, include an "Overall accuracy" row.}
 }
 \value{
-Invisibly returns the metrics data.frame.
+Invisibly returns a \code{data.frame} with per-class metrics and optional summary rows.
 }
 \description{
-Prints a table with per-class precision/recall/F1 and an overall macro-average row.
+Formats and prints a per-class metrics table from the output of
+\code{\link{evaluate_single_las}} or \code{\link{evaluate_two_las}}.
+The table includes per-class Support, Accuracy (Recall), Precision, Recall, and F1.
+Optionally includes Macro and Weighted averages, and an Overall accuracy row.
+}
+\details{
+\itemize{
+\item \strong{Support}: number of true points in each class (row sum of confusion matrix).
+\item \strong{Accuracy}: per-class accuracy here means \strong{Recall} (TP / (TP + FN)).
+This is sometimes called \emph{producer's accuracy}.
+\item \strong{Macro avg}: unweighted mean across classes (ignores class imbalance).
+\item \strong{Weighted avg}: mean across classes weighted by Support (reflects imbalance).
+\item \strong{Overall accuracy}: sum(diag(cm)) / sum(cm). This is optional because
+it often duplicates the weighted recall/accuracy in multi-class settings.
+}
 }
 \examples{
-cm <- table(True = c(0, 0, 1, 1), Pred = c(0, 1, 1, 1))
-pr <- diag(cm) / colSums(cm)
-rc <- diag(cm) / rowSums(cm)
-f1 <- 2 * pr * rc / (pr + rc)
-res <- list(precision = pr, recall = rc, f1 = f1)
-print_metrics_table(res)
+\dontrun{
+library(lidR)
+las <- readLAS("C:/Users/vs.naga/Documents/Github/FuelDeep3D/inst/extdata/las/trees.laz")
+
+res <- evaluate_single_las(
+  las,
+  truth_col = "label",
+  pred_col  = "Classification",
+  classes   = 0:2,
+  class_names = c("0"="Ground","1"="Branch","2"="Leaves")
+)
+
+# print without overall accuracy row (recommended)
+# print_metrics_table(res, include_overall = FALSE)
+
+# If you want overall accuracy too:
+print_metrics_table(res, include_overall = TRUE)
+}
 
 }
