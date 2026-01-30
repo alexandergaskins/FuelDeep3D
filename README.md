@@ -154,7 +154,7 @@ predict(cfg, mode = "overwrite", setup_env = FALSE)
 The figure below shows an example of the vegetation segmentation applied to a labeled LAS file.
 Each point is colored by its predicted class (e.g., ground/understory, stem, canopy foliage).
 
-![Example segmentation output](inst/readme/trees.png)
+![Example segmentation output](inst/readme/cover2_new.png)
 
 <p align="center">
   <img src="inst/readme/tree.gif" alt="Single tree segmentation output" width="45%">
