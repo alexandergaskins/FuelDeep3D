@@ -167,7 +167,7 @@ field, which can be visualized in tools like CloudCompare or QGIS using a class-
 
 ---
 
-## 4. Pre-processing
+## 4. Pre-processing and Training
 
 Pre-processing prepares raw TLS point clouds for deep learning–based fuel
 segmentation. This step focuses on removing obvious outliers, standardizing
@@ -213,7 +213,7 @@ las_clean <- remove_noise_sor(
 plot(las_clean, color = "Z", pal = height.colors(30), bg = "white")
 ```
 
-## 5. Train a new model on your own labelled LAS data
+### 4.2 Train a new model on your own labelled LAS data
 
 
 ```r
@@ -239,7 +239,7 @@ predict(cfg, mode = "overwrite", setup_env = FALSE)  # writes trees_predicted.la
 
 ---
 
-## 6. Evaluation of Predicted LAS Files
+## 5. Evaluation of Predicted LAS Files
 
 you can compute accuracy, confusion matrix, precision, recall, and F1 directly.
 
@@ -251,7 +251,7 @@ FuelDeep3D includes evaluation utilities to measure segmentation quality using L
 
 ---
 
-  ### 6.1.1 Evaluate a Single LAS File
+  ### 5.1.1 Evaluate a Single LAS File
 
   This function allows users to evaluate segmentation performance directly from a single LAS file that contains both ground-truth labels and predicted classes.
   Simply specify which attribute stores the true labels (e.g., "label") and which stores the predictions (e.g., "Classification"), and the function computes accuracy, confusion matrix, precision, recall, and F1 scores automatically.
@@ -283,7 +283,7 @@ FuelDeep3D includes evaluation utilities to measure segmentation quality using L
 
  ---
 
-  ### 6.1.2 Evaluate Two LAS Files
+  ### 5.1.2 Evaluate Two LAS Files
 
   Use this when ground truth labels and predicted classes are saved in two separate LAS/LAZ files.
   Both files must be point-wise aligned (same points in the same order, same number of points).
@@ -325,7 +325,7 @@ FuelDeep3D includes evaluation utilities to measure segmentation quality using L
   ---
 
 
-  ### 6.2 Print Confusion Matrix
+  ### 5.2 Print Confusion Matrix
 
   ```r
   print_confusion_matrix(results$confusion)
@@ -344,7 +344,7 @@ FuelDeep3D includes evaluation utilities to measure segmentation quality using L
 
   ---
 
-  ### 6.3 Print Precision, Recall, F1 and Accuracy in a Table
+  ### 5.3 Print Precision, Recall, F1 and Accuracy in a Table
 
   ```r
   print_metrics_table(results)
@@ -367,7 +367,7 @@ FuelDeep3D includes evaluation utilities to measure segmentation quality using L
 
   ---
 
-  ### 6.4 Plot Confusion Matrix (Heatmap)
+  ### 5.4 Plot Confusion Matrix (Heatmap)
 
   FuelDeep3D can also plot the confusion matrix as a heatmap in R (requires `ggplot2`).  
   These plots help quickly identify which classes are most frequently confused and whether errors are concentrated in specific rows/columns.
@@ -404,7 +404,7 @@ FuelDeep3D includes evaluation utilities to measure segmentation quality using L
 
  ---
 
-  ### 6.5 Class Distribution Summary
+  ### 5.5 Class Distribution Summary
 
   ```r
   class_summary(las)
