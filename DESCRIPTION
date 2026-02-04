@@ -21,9 +21,11 @@ Description: Provides tools for preprocessing, feature extraction, and segmentat
 Depends:
     R (>= 4.1)
 Imports:
-    lidR,
-    reticulate
+    stats,
+    utils
 Suggests:
+    lidR,
+    reticulate,
     dbscan,
     ggplot2,
     rgl,
