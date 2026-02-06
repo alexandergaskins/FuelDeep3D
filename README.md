@@ -126,7 +126,7 @@ plot(las, color = "Z", pal = height.colors(30), bg='white')
 ```
 
 <p align="center">
-  <img src="inst/readme/raw_pal.png" alt="Raw LiDAR visualization" width="85%">
+  <img src="inst/readme/plot_height.png" alt="Raw LiDAR visualization" width="85%">
 </p>
 
 This view helps inspect canopy structure, terrain variation, and overall point-cloud quality.
@@ -439,6 +439,7 @@ available at: <https://CRAN.R-project.org/package=FuelDeep3D>
 **FuelDeep3D package comes with no guarantee, expressed or implied, and
 the authors hold no responsibility for its use or reliability of its
 outputs.**
+
 
 
 
