@@ -105,14 +105,14 @@ py_config()
 ## 2. Visualization of a 3D point cloud
 
 `FuelDeep3D` integrates smoothly with the **lidR** package, enabling users to quickly explore
-raw LiDAR scenes, height structures, and model-predicted segmentations.  
+LiDAR scenes, height structures, and model-predicted segmentations.  
 This section provides simple commands to visualize `.las` / `.laz` files during your workflow.
 
 ---
 
-### 2.1 Visualize Raw LiDAR by Height (Z)
+### 2.1 Visualize LiDAR data by Height (Z)
 
-This visualization shows the raw, unclassified LiDAR point cloud, where points are colored solely based on their height (Z value).
+This visualization shows the unclassified LiDAR point cloud, where points are colored solely based on their height (Z value).
 This height-based coloring helps reveal canopy layers, trunk structure, and ground elevation differences.
 
 ```r
@@ -429,16 +429,12 @@ We gratefully acknowledge ------------
 Please report any issue regarding the FuelDeep3D package to Venkata Siva Reddy Naga (<vs.naga@ufl.edu>)  or Dr. Silva
 (<c.silva@ufl.edu>).
 
-# Citing FuelDeep3D
-
-Venkata Siva Naga; Silva,C.A. FuelDeep3D: An R R wrapper around a PyTorch point-cloud model for tree / vegetation segmentation from LiDAR .las files.version 0.0.1, accessed on Dec. 13 2025,
-available at: <https://CRAN.R-project.org/package=FuelDeep3D>
-
 # Disclaimer
 
 **FuelDeep3D package comes with no guarantee, expressed or implied, and
 the authors hold no responsibility for its use or reliability of its
 outputs.**
+
 
 
 
