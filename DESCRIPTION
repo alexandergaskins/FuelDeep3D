@@ -21,8 +21,7 @@ Description: Provides tools for preprocessing, feature extraction, and segmentat
 Depends:
     R (>= 4.1)
 Imports:
-    stats,
-    utils
+    stats
 Suggests:
     lidR,
     reticulate,

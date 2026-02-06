@@ -105,8 +105,7 @@ train <- function(cfg, setup_env = FALSE) {
       REPEAT_PER_TILE = cfg$repeat_per_tile,
       MIN_PTS_TILE    = cfg$min_pts_tile,
       CELL_SIZE       = cfg$cell_size,
-      QUANTILE        = cfg$quantile,
-      DELETE_TILES_AFTER_TRAIN = cfg$delete_tiles_after_train
+      QUANTILE        = cfg$quantile
     )
   } else {
     message(">> Found existing NPZ tiles in ", train_dir, " -> skipping preprocessing.")
