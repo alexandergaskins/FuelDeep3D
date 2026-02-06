@@ -52,12 +52,15 @@ library(FuelDeep3D)
 
 ---
 
-### 1.1.1 Manual installation using Anaconda/Miniconda
+### 1.1.1 Manual installation using Anaconda/Miniconda (Only if not already installed)
 
 **i) Download**
 
 - Anaconda (full distribution, includes many packages):  
   <https://www.anaconda.com/download>
+
+OR
+  
 - Miniconda (lightweight, only Conda + Python):  
   <https://docs.conda.io/en/latest/miniconda.html>
 
@@ -130,7 +133,7 @@ This view helps inspect canopy structure, terrain variation, and overall point-c
 
 ---
 
-## 3. Predict on a new lidar using a pre-trained model
+## 3. Predict on new data using a pre-trained model
 
 ```r
 library(FuelDeep3D)
@@ -151,15 +154,14 @@ predict(cfg, mode = "overwrite", setup_env = FALSE)
 
 ## 3.1 Predicted Result
 
-The figure below shows an example of the vegetation segmentation applied to a labeled LAS file.
-Each point is colored by its predicted class (e.g., ground/understory, stem, canopy foliage).
-
 ![Example segmentation output](inst/readme/cover2_new.png)
+
+An example of the vegetation segmentation applied to a labeled LAS file.
+Each point is colored by its predicted class (e.g., ground/understory, stem, canopy foliage).
 
 <p align="center">
   <img src="inst/readme/tree.gif" alt="Single tree segmentation output" width="45%">
 </p>
-
 
 In this example, the model was trained on `trees.las` and then used to predict labels for the
 same scene. The output LAS (`trees_predicted.las`) stores predictions in the `classification`
@@ -251,7 +253,7 @@ FuelDeep3D includes evaluation utilities to measure segmentation quality using L
 
 ---
 
-  ### 5.1.1 Evaluate a Single LAS File
+  ### 5.1.1 Evaluate Performance on a Single LAS File
 
   This function allows users to evaluate segmentation performance directly from a single LAS file that contains both ground-truth labels and predicted classes.
   Simply specify which attribute stores the true labels (e.g., "label") and which stores the predictions (e.g., "Classification"), and the function computes accuracy, confusion matrix, precision, recall, and F1 scores automatically.
@@ -283,7 +285,7 @@ FuelDeep3D includes evaluation utilities to measure segmentation quality using L
 
  ---
 
-  ### 5.1.2 Evaluate Two LAS Files
+  ### 5.1.2 Evaluate Performance on Two LAS Files
 
   Use this when ground truth labels and predicted classes are saved in two separate LAS/LAZ files.
   Both files must be point-wise aligned (same points in the same order, same number of points).
@@ -437,6 +439,7 @@ available at: <https://CRAN.R-project.org/package=FuelDeep3D>
 **FuelDeep3D package comes with no guarantee, expressed or implied, and
 the authors hold no responsibility for its use or reliability of its
 outputs.**
+
 
 
 
