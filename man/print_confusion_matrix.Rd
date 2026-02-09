@@ -27,7 +27,7 @@ print_confusion_matrix(
 
 \item{digits}{Integer. Number of decimal places to show when \code{row_normalize = TRUE}.}
 
-\item{classes}{Optional integer vector of expected class IDs (e.g. \code{0:2}).
+\item{classes}{Optional integer vector of expected class IDs (e.g., \code{0:2}).
 Keeps matrix shape stable even if some classes are missing.}
 
 \item{class_names}{Optional mapping for nicer labels (named or unnamed).}
@@ -37,7 +37,7 @@ Keeps matrix shape stable even if some classes are missing.}
 \item{drop_na}{Logical. Drop rows where truth/pred is NA/Inf (used when \code{x} is LAS).}
 }
 \value{
-Invisibly returns the printed data.frame.
+Invisibly returns the printed data frame.
 }
 \description{
 Prints a confusion matrix as a readable table. You can pass either:

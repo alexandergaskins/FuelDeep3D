@@ -164,7 +164,7 @@ metrics_from_cm <- function(cm) {
 #'   }
 #' @param show_codes Logical. If \code{TRUE} (default), class labels display like \code{"0 (Ground)"}.
 #'
-#' @return A list containing confusion matrix and metrics.
+#' @return A list containing the confusion matrix and metrics.
 #'
 #' @examples
 #' \dontrun{
@@ -261,18 +261,18 @@ evaluate_single_las <- function(las,
 #' Evaluate predictions stored in two LAS/LAZ objects
 #'
 #' @description
-#' Computes confusion matrix and metrics when ground truth and predictions come from
+#' Computes the confusion matrix and metrics when ground truth and predictions come from
 #' two separate \code{lidR::LAS} objects.
 #'
 #' @details
-#' \strong{Important:} This assumes the LAS objects are point-wise aligned (same points,
-#' same order). If they are not aligned, metrics will be meaningless.
+#' \strong{Important:} This assumes the LAS objects are point-wise aligned (with the same points and order).
+#' If they are not aligned, metrics will be meaningless.
 #'
 #' @inheritParams evaluate_single_las
 #' @param truth_las A \code{lidR::LAS} containing ground-truth labels.
 #' @param pred_las A \code{lidR::LAS} containing predicted labels.
 #'
-#' @return A list containing confusion matrix and metrics.
+#' @return A list containing the confusion matrix and metrics.
 #'
 #' @examples
 #' \dontrun{
@@ -398,8 +398,10 @@ evaluate_two_las <- function(truth_las,
 #'   \item \strong{Automatic range}: If \code{zlim = NULL}, the observed \code{Z} range
 #'   (after any optional subsampling) is used automatically.
 #'
-#'   \item \strong{Custom palettes (\code{height_palette})}: You can provide a vector of colors
+#' \itemize{
+#'   \item \strong{Custom palettes} (\code{height_palette}): You can provide a vector of colors
 #'   (e.g., \code{c("purple","blue","cyan","yellow","red")}) to define the height color ramp.
+#' }
 #'
 #'   \item \strong{Performance (\code{max_points})}: Rendering millions of points can be slow.
 #'   If \code{max_points} is set and the LAS has more points than this value, points are randomly
@@ -419,7 +421,7 @@ evaluate_two_las <- function(truth_las,
 #' @param size Numeric. Point size passed to \code{rgl::points3d()}.
 #' @param max_points Integer. Maximum number of points to plot. If the LAS contains more than
 #'   \code{max_points}, a random subset of size \code{max_points} is drawn for faster rendering.
-#'   Use \code{NULL} to plot all points (may be slow for large clouds).
+#'   Use \code{NULL} to plot all points. This may be slow for large point clouds.
 #' @param title Character. Title shown in the 3D window (via \code{rgl::title3d()}).
 #'
 #' @return Invisibly returns \code{NULL}.
@@ -534,7 +536,7 @@ plot_las_3d <- function(las,
 #' @description
 #' Formats and prints a per-class metrics table from the output of
 #' \code{\link{evaluate_single_las}} or \code{\link{evaluate_two_las}}.
-#' The table includes per-class Support, Accuracy (Recall), Precision, Recall, and F1.
+#' The table includes per-class Support, Accuracy, Precision, Recall, and F1.
 #' Optionally includes Macro and Weighted averages, and an Overall accuracy row.
 #'
 #' @details
@@ -670,7 +672,7 @@ print_metrics_table <- function(results,
 #' preserved unchanged.
 #'
 #' @details
-#' The filter is applied only to points with \code{Z > height_thresh}.
+#' The filter is applied only to points with \code{Z} is greater than \code{height_thresh}.
 #' For each of these points, the mean distance to its \code{k} nearest neighbors
 #' is computed in 3D XYZ space. A point is kept if:
 #' \deqn{d_i < mean(d) + zscore * sd(d)}
@@ -800,7 +802,7 @@ remove_noise_sor <- function(las,
 #' @param x A confusion matrix (table/matrix) OR a \code{lidR::LAS} object.
 #' @param truth_col Character. Truth label column name (used when \code{x} is LAS).
 #' @param pred_col Character. Prediction column name (used when \code{x} is LAS).
-#' @param classes Optional integer vector of expected class IDs (e.g. \code{0:2}).
+#' @param classes Optional integer vector of expected class IDs (e.g., \code{0:2}).
 #'   Keeps matrix shape stable even if some classes are missing.
 #' @param class_names Optional mapping for nicer labels (named or unnamed).
 #' @param show_codes Logical. If \code{TRUE} (default), labels display like \code{"0 (Ground)"}.
@@ -808,7 +810,7 @@ remove_noise_sor <- function(las,
 #' @param row_normalize Logical. If TRUE, each row is converted to proportions (rows sum to 1).
 #' @param digits Integer. Number of decimal places to show when \code{row_normalize = TRUE}.
 #'
-#' @return Invisibly returns the printed data.frame.
+#' @return Invisibly returns the printed data frame.
 #'
 #' @examples
 #' \dontrun{

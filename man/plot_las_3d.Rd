@@ -30,7 +30,7 @@ If \code{NULL}, a default sequential palette is used.}
 
 \item{max_points}{Integer. Maximum number of points to plot. If the LAS contains more than
 \code{max_points}, a random subset of size \code{max_points} is drawn for faster rendering.
-Use \code{NULL} to plot all points (may be slow for large clouds).}
+Use \code{NULL} to plot all points. This may be slow for large point clouds.}
 
 \item{title}{Character. Title shown in the 3D window (via \code{rgl::title3d()}).}
 }
@@ -55,8 +55,10 @@ understory/canopy.
 \item \strong{Automatic range}: If \code{zlim = NULL}, the observed \code{Z} range
 (after any optional subsampling) is used automatically.
 
-\item \strong{Custom palettes (\code{height_palette})}: You can provide a vector of colors
+\itemize{
+\item \strong{Custom palettes} (\code{height_palette}): You can provide a vector of colors
 (e.g., \code{c("purple","blue","cyan","yellow","red")}) to define the height color ramp.
+}
 
 \item \strong{Performance (\code{max_points})}: Rendering millions of points can be slow.
 If \code{max_points} is set and the LAS has more points than this value, points are randomly

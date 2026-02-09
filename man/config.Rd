@@ -68,7 +68,7 @@ backend will choose automatically.}
 
 \item{cell_size}{Grid cell size (meters) used for height normalization/statistics.}
 
-\item{quantile}{Quantile threshold used in metrics/filters in the Python pipeline.}
+\item{quantile}{Quantile of the threshold used in metrics/filters in the Python pipeline.}
 
 \item{num_classes}{Number of output classes. Supported values are \code{3} or \code{4}.
 If \code{4}, ground can be added using CSF post-processing.}

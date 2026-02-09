@@ -74,7 +74,7 @@
 #' @param learning_rate Optimizer learning rate.
 #' @param weight_decay L2 regularization strength (weight decay).
 #' @param cell_size Grid cell size (meters) used for height normalization/statistics.
-#' @param quantile Quantile threshold used in metrics/filters in the Python pipeline.
+#' @param quantile Quantile of the threshold used in metrics/filters in the Python pipeline.
 #' @param num_classes Number of output classes. Supported values are \code{3} or \code{4}.
 #'   If \code{4}, ground can be added using CSF post-processing.
 #' @param csf_args Named list of arguments forwarded to \code{RCSF::csf()} inside
