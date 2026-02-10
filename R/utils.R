@@ -377,85 +377,138 @@ evaluate_two_las <- function(truth_las,
 # ------------------------------------------------------------
 # 3D LAS Visualization (height-colored, configurable background)
 # ------------------------------------------------------------
-
-#' 3D visualization of a LAS object colored by height (Z) using rgl
+#' Plot a 3D LAS point cloud colored by elevation
 #'
 #' @description
-#' Opens an interactive \pkg{rgl} 3D window and plots a \code{\link[lidR]{LAS}} point cloud,
-#' coloring points by their height (\code{Z}). The background color and the height range used
-#' for coloring can be customized. For large point clouds, \code{max_points} can be used to
-#' subsample points for faster rendering.
+#' Visualize a \code{lidR::LAS} point cloud in 3D using \pkg{rgl}, with points colored by elevation (Z).
+#' Supports subsampling for performance, custom height color ramps, optional coordinate centering,
+#' an optional compact legend, and optional "thickness by height" (points become larger at higher Z).
 #'
 #' @details
-#' Points are colored using their \code{Z} (height) values mapped to a continuous color gradient.
-#'
+#' **Color mapping**
 #' \itemize{
-#'   \item \strong{Height scaling (\code{zlim})}: If \code{zlim = c(zmin, zmax)} is provided,
-#'   \code{Z} values are clamped to \code{[zmin, zmax]} before mapping to colors. This prevents
-#'   extreme outliers from dominating the color scale and helps preserve contrast in the
-#'   understory/canopy.
-#'
-#'   \item \strong{Automatic range}: If \code{zlim = NULL}, the observed \code{Z} range
-#'   (after any optional subsampling) is used automatically.
-#'
-#' \itemize{
-#'   \item \strong{Custom palettes} (\code{height_palette}): You can provide a vector of colors
-#'   (e.g., \code{c("purple","blue",} \code{"cyan","yellow","red")}) to define the height color ramp.
+#'   \item Elevations are optionally clamped to \code{zlim} and normalized to \eqn{[0,1]} for palette lookup.
+#'   \item When \code{zlim} is provided, values outside the range are clamped so the color scale stays comparable.
 #' }
 #'
-#'   \item \strong{Performance (\code{max_points})}: Rendering millions of points can be slow.
-#'   If \code{max_points} is set and the LAS has more points than this value, points are randomly
-#'   subsampled (without modifying the original LAS object) to improve interactivity.
+#' **Legend**
+#' \itemize{
+#'   \item The legend shows the same color scale as used for points.
+#'   \item When \code{legend_label_mode = "norm_z"}, labels are shown as
+#'   \code{norm=0 (z = ...)} and \code{norm=1 (z = ...)} to clarify that 0/1 refers to the normalized scale.
+#'   \item Use \code{legend_height_frac} to shorten the legend visually (e.g., 0.5 = half height).
 #' }
 #'
-#' This function is intentionally skipped during \code{R CMD check} to avoid interactive graphics
-#' in CRAN checks.
+#' **CRAN / non-interactive environments**
+#' \itemize{
+#'   \item During \code{R CMD check}, the function returns early (no \pkg{rgl} window is opened).
+#'   \item If \pkg{rgl} is not installed, a warning is raised and the function returns invisibly.
+#' }
 #'
-#' @param las A \code{\link[lidR]{LAS}} object.
-#' @param bg Character. Background color passed to \code{rgl::bg3d()}. Common values include
-#'   \code{"black"} and \code{"white"}.
-#' @param zlim Numeric vector of length 2 (e.g., \code{c(0, 35)}) giving the height range used for
-#'   color mapping. Values outside this range are clamped. If \code{NULL}, the observed range is used.
-#' @param height_palette Character vector of colors used to build the height color ramp.
-#'   If \code{NULL}, a default sequential palette is used.
-#' @param size Numeric. Point size passed to \code{rgl::points3d()}.
-#' @param max_points Integer. Maximum number of points to plot. If the LAS contains more than
-#'   \code{max_points}, a random subset of size \code{max_points} is drawn for faster rendering.
-#'   Use \code{NULL} to plot all points. This may be slow for large point clouds.
-#' @param title Character. Title shown in the 3D window (via \code{rgl::title3d()}).
+#' @param las A \code{lidR::LAS} object.
+#' @param bg Background color for the \pkg{rgl} scene. (e.g., \code{"black"}, \code{"white"}, \code{"#111111"}).
+#' @param zlim NULL or numeric length-2 vector giving the Z range used for coloring (values are clamped to this range).
+#' @param height_palette Vector of colors to define the height color ramp
+#' (e.g., \code{c("purple","blue","cyan","yellow","red")}).
+#' @param size Numeric. Base point size (thickness). If \code{size_by_height = TRUE}, this acts as a multiplier on \code{size_range}.
+#' @param max_points Integer. If LAS has more than this many points, a random subsample is plotted for speed.
+#' Use NULL to disable subsampling.
+#' @param title Character. Plot title (converted to ASCII-safe to avoid \pkg{rgl} text errors).
+#' @param center Logical. If TRUE, shifts X/Y/Z so minima become 0 (helps visualization when coordinates are large).
 #'
-#' @return Invisibly returns \code{NULL}.
+#' @param add_legend Logical. If TRUE, draws a vertical colorbar and min/max labels.
+#' @param legend_height_frac Numeric in (0,1]. Visually compress legend height (e.g., 0.5 = half height).
+#' @param legend_width_frac Numeric. Legend width as a fraction of X-range.
+#' @param legend_xpad_frac Numeric. Legend x-offset as a fraction of X-range.
+#' @param legend_side Character. Either \code{"right"} or \code{"left"}.
+#' @param legend_pos Numeric length-2 vector \code{c(x, y)} to override legend base position (use NA to ignore a coordinate).
+#' @param legend_label_mode Character. One of \code{"norm_z"}, \code{"z"}, or \code{"norm"}.
+#' @param z_digits Integer. Number of digits used for legend Z labels.
+#' @param z_unit Character. Unit label appended to legend Z values (e.g., \code{"m"}). Use \code{""} for none.
+#'
+#' @param size_by_height Logical. If TRUE, point thickness increases with height.
+#' @param size_range Numeric length-2. Min/max point size (before multiplying by \code{size}) when \code{size_by_height = TRUE}.
+#' @param size_power Numeric > 0. Controls how quickly thickness increases with height (larger = more emphasis at top).
+#'
+#' @param zoom,theta,phi Camera controls passed to \code{rgl::view3d()}.
+#'
+#' @return Invisibly returns NULL.
+#' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' library(lidR)
-#' las <- readLAS(system.file("extdata", "las", "tree2.laz", package = "FuelDeep3D"))
-#' if (!lidR::is.empty(las)) {
-#'   # Black background, color from 0 to 35 height units
-#'   plot_las_3d(las, bg = "black", zlim = c(0, 35), size = 2, max_points = 200000)
 #'
-#'   # White background, automatic height range
-#'   plot_las_3d(las, bg = "white", zlim = NULL, size = 2, max_points = 100000)
+#' las <- readLAS("path/to/your_file.laz")
 #'
-#'   # Custom height palette
-#'   plot_las_3d(
-#'     las,
-#'     bg = "black",
-#'     zlim = c(0, 35),
-#'     height_palette = c("purple", "blue", "cyan", "yellow", "red"),
-#'     max_points = 150000
-#'   )
+#' # 1) Default plot (black bg, legend on, thickness by height)
+#' plot_las_3d(las)
+#'
+#' # 2) Custom palette + white background
+#' plot_las_3d(
+#'   las,
+#'   bg = "white",
+#'   height_palette = c("purple","blue","cyan","yellow","red"),
+#'   title = "Custom palette"
+#' )
+#'
+#' # 3) Fixed Z color scale for comparisons + no legend
+#' plot_las_3d(
+#'   las,
+#'   zlim = c(0, 40),
+#'   add_legend = FALSE,
+#'   title = "Fixed Z (0-40), no legend"
+#' )
+#'
+#' # 4) Turn OFF thickness-by-height; use a single point size
+#' plot_las_3d(
+#'   las,
+#'   size_by_height = FALSE,
+#'   size = 4,
+#'   title = "Uniform thicker points"
+#' )
+#'
+#' # 5) Legend on the LEFT and thicker legend bar
+#' plot_las_3d(
+#'   las,
+#'   legend_side = "left",
+#'   legend_width_frac = 0.05,
+#'   title = "Legend left"
+#' )
+#'
+#' # 6) Make everything thicker (multiplies size_range when size_by_height=TRUE)
+#' plot_las_3d(
+#'   las,
+#'   size = 1.8,
+#'   size_range = c(1, 7),
+#'   size_power = 1.2,
+#'   title = "Thicker points by height"
+#' )
 #' }
-#' }
-#'
-#' @export
 plot_las_3d <- function(las,
                         bg = "black",
                         zlim = NULL,
                         height_palette = NULL,
                         size = 2,
                         max_points = 200000L,
-                        title = "LAS 3D View") {
+                        title = "LAS 3D View",
+                        center = FALSE,
+                        add_legend = TRUE,
+                        legend_height_frac = 0.5,
+                        legend_width_frac = 0.015,
+                        legend_xpad_frac = 0.03,
+                        legend_side = "right",
+                        legend_pos  = c(NA_real_, NA_real_),
+                        legend_label_mode = c("rel_z", "norm_z", "z", "norm"),
+                        z_digits = 2L,
+                        z_unit = "",
+                        size_by_height = TRUE,
+                        size_range = c(1, 7),
+                        size_power = 1.2,
+                        zoom = 0.7,
+                        theta = 0,
+                        phi = -90) {
+  
   if (!requireNamespace("lidR", quietly = TRUE)) {
     stop("Package 'lidR' is required. Install it with install.packages('lidR').", call. = FALSE)
   }
@@ -474,6 +527,22 @@ plot_las_3d <- function(las,
   
   if (lidR::is.empty(las)) return(invisible(NULL))
   
+  # -------- helpers --------
+  safe_ascii <- function(s) {
+    s <- gsub("\u2013|\u2014", "-", s)  # en/em dash -> hyphen
+    iconv(s, from = "", to = "ASCII//TRANSLIT", sub = "")
+  }
+  
+  pick_text_col <- function(bg_col) {
+    rgb <- try(grDevices::col2rgb(bg_col), silent = TRUE)
+    if (inherits(rgb, "try-error")) return("white")
+    r <- rgb[1, 1] / 255; g <- rgb[2, 1] / 255; b <- rgb[3, 1] / 255
+    lum <- 0.2126 * r + 0.7152 * g + 0.0722 * b
+    if (lum < 0.5) "white" else "black"
+  }
+  
+  legend_label_mode <- match.arg(legend_label_mode)
+  
   # optional subsample for performance
   n <- lidR::npoints(las)
   if (!is.null(max_points) && is.finite(max_points) && max_points > 0 && n > max_points) {
@@ -484,48 +553,163 @@ plot_las_3d <- function(las,
   }
   
   xyz <- las_plot@data[, c("X", "Y", "Z"), drop = FALSE]
-  z <- xyz[["Z"]]
+  x <- xyz[["X"]]; y <- xyz[["Y"]]; z <- xyz[["Z"]]
   
-  # choose z-limits
+  # optional centering (display coordinates)
+  if (isTRUE(center)) {
+    x <- x - min(x, na.rm = TRUE)
+    y <- y - min(y, na.rm = TRUE)
+    z_disp <- z - min(z, na.rm = TRUE)
+  } else {
+    z_disp <- z
+  }
+  
+  # choose z-limits for coloring
   if (is.null(zlim)) {
-    zmin <- min(z, na.rm = TRUE)
-    zmax <- max(z, na.rm = TRUE)
+    zmin <- min(z_disp, na.rm = TRUE)
+    zmax <- max(z_disp, na.rm = TRUE)
   } else {
     if (!is.numeric(zlim) || length(zlim) != 2L || any(!is.finite(zlim))) {
       stop("zlim must be NULL or a numeric vector of length 2 with finite values.", call. = FALSE)
     }
-    zmin <- min(zlim)
-    zmax <- max(zlim)
+    zmin <- min(zlim); zmax <- max(zlim)
   }
   if (!is.finite(zmin) || !is.finite(zmax) || zmin == zmax) {
     stop("Invalid z-range for coloring (zlim or data range).", call. = FALSE)
   }
   
-  # clamp and normalize Z to [0,1]
-  zc <- pmin(pmax(z, zmin), zmax)
-  t <- (zc - zmin) / (zmax - zmin)
+  # clamp and normalize to [0,1]
+  zc <- pmin(pmax(z_disp, zmin), zmax)
+  t  <- (zc - zmin) / (zmax - zmin)
   
   # palette
   if (is.null(height_palette)) {
-    height_palette <- c("#440154FF", "#31688EFF", "#35B779FF", "#FDE725FF") # safe default (ASCII)
+    height_palette <- c("blue", "darkgreen", "green", "yellow", "orange", "red", "darkred")
   }
   ramp <- grDevices::colorRampPalette(height_palette)
-  cols <- ramp(256L)[pmax(1L, pmin(256L, as.integer(round(t * 255L)) + 1L))]
+  pal  <- ramp(256L)
+  cols <- pal[pmax(1L, pmin(256L, as.integer(round(t * 255L)) + 1L))]
   
+  # scene
+  text_col <- pick_text_col(bg)
   rgl::open3d()
   rgl::bg3d(color = bg)
-  rgl::title3d(title)
+  rgl::title3d(safe_ascii(title), color = text_col)
   
-  rgl::points3d(
-    x = xyz[["X"]],
-    y = xyz[["Y"]],
-    z = xyz[["Z"]],
-    col = cols,
-    size = size
-  )
+  # ---------- points ----------
+  if (!isTRUE(size_by_height)) {
+    rgl::points3d(x, y, z_disp, col = cols, size = size)
+  } else {
+    if (!is.numeric(size_range) || length(size_range) != 2L) {
+      stop("size_range must be numeric length-2, e.g., c(1, 7).", call. = FALSE)
+    }
+    # size is a multiplier so users always "see" point size
+    smin <- min(size_range) * size
+    smax <- max(size_range) * size
+    
+    if (!is.finite(smin) || !is.finite(smax) || smin <= 0 || smax <= 0) {
+      stop("size_range * size must be finite and > 0.", call. = FALSE)
+    }
+    pwr <- ifelse(is.finite(size_power) && size_power > 0, size_power, 1)
+    tt <- t ^ pwr
+    
+    # bin + draw in layers (portable; avoids per-point size vector issues)
+    nb <- 7L
+    bins <- cut(tt, breaks = nb, include.lowest = TRUE, labels = FALSE)
+    
+    for (b in seq_len(nb)) {
+      idx <- which(bins == b)
+      if (length(idx)) {
+        frac <- (b - 1) / (nb - 1)
+        sb <- smin + (smax - smin) * (frac ^ pwr)
+        rgl::points3d(x[idx], y[idx], z_disp[idx], col = cols[idx], size = sb)
+      }
+    }
+  }
   
+  # ---------- legend ----------
+  if (isTRUE(add_legend)) {
+    frac_h <- max(0.05, min(1, legend_height_frac))
+    xr <- diff(range(x, na.rm = TRUE)); if (!is.finite(xr) || xr <= 0) xr <- 1
+    
+    w    <- max(0.001, legend_width_frac) * xr
+    xpad <- max(0.0,   legend_xpad_frac)  * xr
+    
+    # anchor by side
+    if (tolower(legend_side) == "left") {
+      xpos0 <- min(x, na.rm = TRUE) - xpad - w
+    } else {
+      xpos0 <- max(x, na.rm = TRUE) + xpad
+    }
+    ypos0 <- min(y, na.rm = TRUE)
+    
+    # optional override
+    if (is.numeric(legend_pos) && length(legend_pos) == 2L) {
+      if (is.finite(legend_pos[1])) xpos0 <- legend_pos[1]
+      if (is.finite(legend_pos[2])) ypos0 <- legend_pos[2]
+    }
+    
+    zseq <- seq(zmin, zmax, length.out = 200)
+    tbar <- (zseq - zmin) / (zmax - zmin)
+    cols_bar <- pal[pmax(1L, pmin(256L, as.integer(round(tbar * 255L)) + 1L))]
+    
+    # compressed bar coordinates (visual), but still represents full zmin..zmax
+    zb0  <- zmin
+    zb1  <- zmin + frac_h * (zmax - zmin)
+    zpos <- zb0 + frac_h * (zseq - zmin)
+    
+    for (i in seq_len(length(zseq) - 1)) {
+      rgl::quads3d(
+        c(xpos0, xpos0 + w, xpos0 + w, xpos0),
+        c(ypos0, ypos0, ypos0, ypos0),
+        c(zpos[i], zpos[i], zpos[i + 1], zpos[i + 1]),
+        col = cols_bar[i],
+        lit = FALSE
+      )
+    }
+    
+    # labels outside bar depending on side
+    xlab <- if (tolower(legend_side) == "left") xpos0 - 2*w else xpos0 + 2*w
+    adjx <- if (tolower(legend_side) == "left") 1 else 0
+    
+    zfmt <- paste0("%.", as.integer(z_digits), "f")
+    zmin_s <- sprintf(zfmt, zmin)
+    zmax_s <- sprintf(zfmt, zmax)
+    unit_s <- if (nzchar(z_unit)) paste0(" ", z_unit) else ""
+    
+    # Relative height range (top - bottom) in the same units as z
+    zspan <- zmax - zmin
+    zspan_s <- sprintf(zfmt, zspan)
+    
+    if (legend_label_mode == "rel_z") {
+      lab_min <- paste0("0", unit_s, " (z = ", zmin_s, unit_s, ")")
+      lab_max <- paste0(zspan_s, unit_s, " (z = ", zmax_s, unit_s, ")")
+      
+    } else if (legend_label_mode == "norm_z") {
+      lab_min <- paste0("norm=0 (z = ", zmin_s, unit_s, ")")
+      lab_max <- paste0("norm=1 (z = ", zmax_s, unit_s, ")")
+      
+    } else if (legend_label_mode == "norm") {
+      lab_min <- "0"
+      lab_max <- "1"
+      
+    } else { # "z"
+      lab_min <- paste0(zmin_s, unit_s)
+      lab_max <- paste0(zmax_s, unit_s)
+    }
+  
+    
+    rgl::text3d(xlab, ypos0, zb0, texts = lab_min, col = text_col, adj = c(adjx, 0))
+    rgl::text3d(xlab, ypos0, zb1, texts = lab_max, col = text_col, adj = c(adjx, 1))
+  }
+  
+  # camera
+  rgl::view3d(theta = theta, phi = phi, zoom = zoom)
   invisible(NULL)
 }
+
+
+
 
 # ============================================================
 # Print metrics table (includes macro/weighted; overall optional)
