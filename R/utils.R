@@ -400,7 +400,7 @@ evaluate_two_las <- function(truth_las,
 #'
 #' \itemize{
 #'   \item \strong{Custom palettes} (\code{height_palette}): You can provide a vector of colors
-#'   (e.g., \code{c("purple","blue","cyan","yellow","red")}) to define the height color ramp.
+#'   (e.g., \code{c("purple","blue",} \code{"cyan","yellow","red")}) to define the height color ramp.
 #' }
 #'
 #'   \item \strong{Performance (\code{max_points})}: Rendering millions of points can be slow.
