@@ -55,7 +55,7 @@
 #'   block_size = 6, stride = 1, sample_n = 4096,
 #'   repeat_per_tile = 4, min_pts_tile = 512,
 #'   cell_size = 0.25, quantile = 0.05,
-#'   delete_tiles_after_train = True
+#'   delete_tiles_after_train = TRUE
 #' )
 #' 
 #' res <- train(cfg, setup_env = FALSE)        # trains & saves best .pth
