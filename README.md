@@ -4,7 +4,7 @@
 
 <!-- This is a comment. [![R-hub](https://github.com/venkatasivanaga/FuelDeep3D/.github/workflows/r.yml/badge.svg)](https://github.com/venkatasivanaga/FuelDeep3D/actions/workflows/rhub.yaml)  --> 
 
-![R-CMD-check](https://github.com/venkatasivanaga/FuelDeep3D/actions/workflows/R-CMD-check.yaml/badge.svg)
+[![R-CMD-check](https://github.com/venkatasivanaga/FuelDeep3D/actions/workflows/r.yml/badge.svg?branch=main)](https://github.com/venkatasivanaga/FuelDeep3D/actions/workflows/r.yml)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 [![CRAN](https://www.r-pkg.org/badges/version/FuelDeep3D)](https://cran.r-project.org/package=FuelDeep3D)
 ![GitHub](https://img.shields.io/badge/GitHub-0.1.0-green.svg)
@@ -438,6 +438,7 @@ Please report any issue regarding the FuelDeep3D package to Venkata Siva Reddy N
 **FuelDeep3D package comes with no guarantee, expressed or implied, and
 the authors hold no responsibility for its use or reliability of its
 outputs.**
+
 
 
 
