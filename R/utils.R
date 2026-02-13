@@ -489,8 +489,8 @@ plot_las_3d <- function(las,
                         bg = "black",
                         zlim = NULL,
                         height_palette = NULL,
-                        size = 2,
-                        max_points = 200000L,
+                        size = 0.6,
+                        max_points = 400000L,
                         title = "LAS 3D View",
                         center = FALSE,
                         add_legend = TRUE,
@@ -501,9 +501,9 @@ plot_las_3d <- function(las,
                         legend_pos  = c(NA_real_, NA_real_),
                         legend_label_mode = c("rel_z", "norm_z", "z", "norm"),
                         z_digits = 2L,
-                        z_unit = "",
+                        z_unit = "m",
                         size_by_height = TRUE,
-                        size_range = c(1, 7),
+                        size_range = c(1, 4),
                         size_power = 1.2,
                         zoom = 0.7,
                         theta = 0,
@@ -584,7 +584,7 @@ plot_las_3d <- function(las,
   
   # palette
   if (is.null(height_palette)) {
-    height_palette <- c("blue", "darkgreen", "green", "yellow", "orange", "red", "darkred")
+    height_palette <- c("blue", "cyan", "green", "yellow", "orange", "red")
   }
   ramp <- grDevices::colorRampPalette(height_palette)
   pal  <- ramp(256L)
@@ -682,10 +682,10 @@ plot_las_3d <- function(las,
     zspan_s <- sprintf(zfmt, zspan)
     
     if (legend_label_mode == "rel_z") {
-      lab_min <- paste0("0", unit_s, " (z = ", zmin_s, unit_s, ")")
-      lab_max <- paste0(zspan_s, unit_s, " (z = ", zmax_s, unit_s, ")")
-      
-    } else if (legend_label_mode == "norm_z") {
+      lab_min <- paste0("0", unit_s, " (z = ", zmin_s, ")")
+      lab_max <- paste0(zspan_s, unit_s, " (z = ", zmax_s, ")")
+    }
+    else if (legend_label_mode == "norm_z") {
       lab_min <- paste0("norm=0 (z = ", zmin_s, unit_s, ")")
       lab_max <- paste0("norm=1 (z = ", zmax_s, unit_s, ")")
       
@@ -697,7 +697,7 @@ plot_las_3d <- function(las,
       lab_min <- paste0(zmin_s, unit_s)
       lab_max <- paste0(zmax_s, unit_s)
     }
-  
+    
     
     rgl::text3d(xlab, ypos0, zb0, texts = lab_min, col = text_col, adj = c(adjx, 0))
     rgl::text3d(xlab, ypos0, zb1, texts = lab_max, col = text_col, adj = c(adjx, 1))
@@ -707,8 +707,6 @@ plot_las_3d <- function(las,
   rgl::view3d(theta = theta, phi = phi, zoom = zoom)
   invisible(NULL)
 }
-
-
 
 
 # ============================================================
