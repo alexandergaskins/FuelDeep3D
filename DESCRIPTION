@@ -32,7 +32,7 @@ Suggests:
     ggplot2,
     rgl,
     RCSF
-License: GPL-3.0-or-later
+License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 URL: https://github.com/venkatasivanaga/FuelDeep3D
