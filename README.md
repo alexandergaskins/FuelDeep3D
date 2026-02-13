@@ -104,7 +104,7 @@ py_config()
 
 ```
 
-> **Note (Troubleshooting):** If you run into any Conda/reticulate issues while creating or activating the `pointnext` environment (e.g., R picks the wrong Python, `py_config()` shows an unexpected interpreter, or you see missing-module/DLL errors), refer to the **Conda + R (reticulate) Troubleshooting Guide** (`inst/readme/conda_reticulate_troubleshooting.md`) for step-by-step diagnostics and fixes.
+> **Note (Troubleshooting):** If you run into any Conda/reticulate issues while creating or activating the `pointnext` environment (e.g., R picks the wrong Python, `py_config()` shows an unexpected interpreter, or you see missing-module/DLL errors), refer to the **[Conda + R (reticulate) Troubleshooting Guide](inst/readme/conda_reticulate_troubleshooting.md)** for step-by-step diagnostics and fixes.
 
 ---
 
