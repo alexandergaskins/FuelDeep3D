@@ -7,6 +7,9 @@ Authors@R:
       person("Venkata Siva Reddy", "Naga",
              role = c("aut", "cre"),
              email = "vs.naga@ufl.edu"),
+      person("Alexander John", "Gaskins",
+              role = "aut",  
+              email = "alexandergaskins@ufl.edu"),
       person("Carlos Alberto", "Silva",
              role = "aut",
              email = "c.silva@ufl.edu")
@@ -29,7 +32,7 @@ Suggests:
     ggplot2,
     rgl,
     RCSF
-License: MIT + file LICENSE
+License: GPL-3.0-or-later
 Encoding: UTF-8
 LazyData: true
 URL: https://github.com/venkatasivanaga/FuelDeep3D

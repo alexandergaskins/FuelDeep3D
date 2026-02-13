@@ -5,7 +5,6 @@
 <!-- This is a comment. [![R-hub](https://github.com/venkatasivanaga/FuelDeep3D/.github/workflows/r.yml/badge.svg)](https://github.com/venkatasivanaga/FuelDeep3D/actions/workflows/rhub.yaml)  --> 
 
 [![R-CMD-check](https://github.com/venkatasivanaga/FuelDeep3D/actions/workflows/r.yml/badge.svg?branch=main)](https://github.com/venkatasivanaga/FuelDeep3D/actions/workflows/r.yml)
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
 [![CRAN](https://www.r-pkg.org/badges/version/FuelDeep3D)](https://cran.r-project.org/package=FuelDeep3D)
 ![GitHub](https://img.shields.io/badge/GitHub-0.1.0-green.svg)
 ![licence](https://img.shields.io/badge/Licence-GPL--3-blue.svg)
@@ -104,6 +103,9 @@ ensure_py_env("pointnext")   # creates env + installs deps the first time
 py_config()
 
 ```
+
+> **Note (Troubleshooting):** If you run into any Conda/reticulate issues while creating or activating the `pointnext` environment (e.g., R picks the wrong Python, `py_config()` shows an unexpected interpreter, or you see missing-module/DLL errors), refer to the **Conda + R (reticulate) Troubleshooting Guide** (`inst/readme/conda_reticulate_troubleshooting.md`) for step-by-step diagnostics and fixes.
+
 ---
 
 ## 2. Visualization of a 3D point cloud
