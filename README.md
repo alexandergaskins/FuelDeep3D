@@ -428,7 +428,12 @@ FuelDeep3D includes evaluation utilities to measure segmentation quality using L
 
 # Acknowledgements
 
-We gratefully acknowledge ------------
+FuelDeep3D was supported by the following projects and programs:
+
+- **ESTCP – FuelsCraft:** An innovative wildland fuel mapping tool for prescribed fire decision support on Department of Defense military installations (**#RC23-7779**)
+- **EMS4D:** MultiScale Fuel Mapping and Decision Support System for the Next Generation of Fire Management (**#22-2-02-15**)
+- **NASA:** ICESat-2 (**Grant #80NSSC23K0941**), Carbon Monitoring System (CMS; **Grant #80NSSC23K1257**), and Commercial Smallsat Data Scientific Analysis (CSDSA; **Grant #80NSSC24K0055**)
+- **Object-Based Aggregation of Fuel Structures, Physics-Based Fire Behavior and Self-Organizing Smoke Plumes for Improved Fuel, Fire, and Smoke Management on Military Lands** (**#RC20-1346**)
 
 # Reporting Issues
 
