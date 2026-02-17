@@ -1087,15 +1087,83 @@ print_confusion_matrix <- function(x,
 #' @examples
 #' \dontrun{
 #' library(lidR)
+#'
+#' # Read LAS/LAZ
 #' las <- readLAS("C:/Users/vs.naga/Documents/Github/FuelDeep3D/inst/extdata/las/trees.laz")
 #'
+#' # Confusion matrix: True labels vs Predicted class (LAS Classification)
 #' cm <- table(True = las@data$label, Pred = las@data$Classification)
 #'
+#' # ------------------------------------------------------------
+#' # 1) Row-normalized confusion matrix (Proportions)
+#' #    - Best to understand per-class recall behavior
+#' #    - row_normalize = TRUE is important here
+#' # ------------------------------------------------------------
 #' plot_confusion_matrix(
 #'   cm,
 #'   row_normalize = TRUE,
 #'   las_name = "trees.laz",
-#'   class_names = c("0"="Ground","1"="Branch","2"="Leaves")
+#'   title = "Confusion Matrix (Row-normalized)",
+#'   class_names = c("0" = "Ground", "1" = "Branch", "2" = "Leaves"),
+#'   palette_type = "viridis",
+#'   palette_name = "cividis"
+#' )
+#'
+#' # ------------------------------------------------------------
+#' # 2) Counts confusion matrix (Raw counts)
+#' #    - Shows absolute misclassification volume
+#' #    - row_normalize = FALSE is important here
+#' # ------------------------------------------------------------
+#' plot_confusion_matrix(
+#'   cm,
+#'   row_normalize = FALSE,
+#'   las_name = "trees.laz",
+#'   title = "Confusion Matrix (Counts)",
+#'   class_names = c("0" = "Ground", "1" = "Branch", "2" = "Leaves"),
+#'   palette_type = "viridis",
+#'   palette_name = "viridis"
+#' )
+#'
+#' # ------------------------------------------------------------
+#' # 3) Brewer palette example (soft + classic)
+#' #    - Works great for both normalized and counts
+#' # ------------------------------------------------------------
+#' plot_confusion_matrix(
+#'   cm,
+#'   row_normalize = TRUE,
+#'   las_name = "trees.laz",
+#'   title = "Confusion Matrix (Brewer Blues, Row-normalized)",
+#'   class_names = c("0" = "Ground", "1" = "Branch", "2" = "Leaves"),
+#'   palette_type = "brewer",
+#'   palette_name = "Blues"
+#' )
+#'
+#' # ------------------------------------------------------------
+#' # 4) Custom modern gradient (minimal + professional)
+#' # ------------------------------------------------------------
+#' plot_confusion_matrix(
+#'   cm,
+#'   row_normalize = TRUE,
+#'   las_name = "trees.laz",
+#'   title = "Confusion Matrix (Custom Gradient, Row-normalized)",
+#'   class_names = c("0" = "Ground", "1" = "Branch", "2" = "Leaves"),
+#'   palette_type = "gradient",
+#'   gradient_low  = "white",
+#'   gradient_high = "#2C3E50"
+#' )
+#'
+#' # ------------------------------------------------------------
+#' # 5) Base palette example (if you still want them)
+#' #    - heat / terrain / topo / cm / rainbow
+#' # ------------------------------------------------------------
+#' plot_confusion_matrix(
+#'   cm,
+#'   row_normalize = TRUE,
+#'   las_name = "trees.laz",
+#'   title = "Confusion Matrix (Base heat, Row-normalized)",
+#'   class_names = c("0" = "Ground", "1" = "Branch", "2" = "Leaves"),
+#'   palette_type = "base",
+#'   palette_name = "heat"
 #' )
 #' }
 #' @export
@@ -1107,9 +1175,27 @@ plot_confusion_matrix <- function(cm,
                                   show_values = TRUE,
                                   class_names = NULL,
                                   show_codes = FALSE,
-                                  flip_y = TRUE) {
+                                  flip_y = TRUE,
+                                  # ---- palette controls ----
+                                  palette_type = c("default", "viridis", "brewer", "gradient", "base"),
+                                  palette_name = NULL,
+                                  brewer_direction = 1,
+                                  gradient_low = "white",
+                                  gradient_high = "#132B43",
+                                  gradient_mid = NULL,
+                                  base_n = 256,
+                                  na_fill = "grey90",
+                                  # ---- label controls ----
+                                  label_size = 4,
+                                  auto_label_color = TRUE,
+                                  label_color_dark = "white",
+                                  label_color_light = "black") {
+  
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("Package 'ggplot2' is required. Install it with install.packages('ggplot2').", call. = FALSE)
+  }
+  if (!requireNamespace("scales", quietly = TRUE)) {
+    stop("Package 'scales' is required. Install it with install.packages('scales').", call. = FALSE)
   }
   
   # Make sure we plot a square matrix with aligned classes
@@ -1130,7 +1216,7 @@ plot_confusion_matrix <- function(cm,
     df$Label <- ifelse(is.na(df$Value), "", formatC(df$Value, format = "f", digits = digits))
     fill_name <- "Proportion"
   } else {
-    df$Label <- as.character(as.integer(round(df$Value)))
+    df$Label <- ifelse(is.na(df$Value), "", as.character(as.integer(round(df$Value))))
     fill_name <- "Count"
   }
   
@@ -1140,16 +1226,14 @@ plot_confusion_matrix <- function(cm,
   
   df$True <- factor(df$True, levels = true_classes, labels = true_labels)
   df$Pred <- factor(df$Pred, levels = pred_classes, labels = pred_labels)
-  
-  # lock y-axis levels for flipping
-  df$True <- factor(df$True, levels = true_labels)
+  df$True <- factor(df$True, levels = true_labels)  # lock for flip
   
   if (!is.null(las_name) && nzchar(las_name)) {
     title <- paste0(title, " - ", las_name)
   }
   
   p <- ggplot2::ggplot(df, ggplot2::aes(x = Pred, y = True, fill = Value)) +
-    ggplot2::geom_tile() +
+    ggplot2::geom_tile(color = "white", linewidth = 0.2) +
     ggplot2::coord_equal() +
     ggplot2::labs(title = title, x = "Predicted", y = "True", fill = fill_name) +
     ggplot2::theme_minimal() +
@@ -1158,8 +1242,120 @@ plot_confusion_matrix <- function(cm,
       axis.text.x = ggplot2::element_text(angle = 45, hjust = 1)
     )
   
+  # ---- apply palette scale ----
+  palette_type <- match.arg(palette_type)
+  
+  if (palette_type == "default") {
+    # ggplot default (do nothing)
+  } else if (palette_type == "viridis") {
+    if (is.null(palette_name)) palette_name <- "viridis"
+    p <- p + ggplot2::scale_fill_viridis_c(option = palette_name, na.value = na_fill)
+  } else if (palette_type == "brewer") {
+    if (!requireNamespace("RColorBrewer", quietly = TRUE)) {
+      stop("Package 'RColorBrewer' is required for palette_type='brewer'. Install it with install.packages('RColorBrewer').",
+           call. = FALSE)
+    }
+    if (is.null(palette_name)) palette_name <- "Blues"
+    p <- p + ggplot2::scale_fill_distiller(
+      palette = palette_name,
+      direction = brewer_direction,
+      na.value = na_fill
+    )
+  } else if (palette_type == "gradient") {
+    if (!is.null(gradient_mid)) {
+      p <- p + ggplot2::scale_fill_gradient2(
+        low = gradient_low, mid = gradient_mid, high = gradient_high,
+        na.value = na_fill
+      )
+    } else {
+      p <- p + ggplot2::scale_fill_gradient(
+        low = gradient_low, high = gradient_high,
+        na.value = na_fill
+      )
+    }
+  } else if (palette_type == "base") {
+    # base palettes: rainbow, heat, terrain, topo, cm.colors
+    if (is.null(palette_name)) palette_name <- "heat"
+    pal_fun <- switch(
+      tolower(palette_name),
+      "rainbow" = grDevices::rainbow,
+      "heat"    = grDevices::heat.colors,
+      "terrain" = grDevices::terrain.colors,
+      "topo"    = grDevices::topo.colors,
+      "cm"      = grDevices::cm.colors,
+      stop("Unknown base palette_name. Use one of: rainbow, heat, terrain, topo, cm", call. = FALSE)
+    )
+    cols <- pal_fun(base_n)
+    p <- p + ggplot2::scale_fill_gradientn(colors = cols, na.value = na_fill)
+  }
+  
+  # ---- adaptive label color (black/white) ----
   if (isTRUE(show_values)) {
-    p <- p + ggplot2::geom_text(ggplot2::aes(label = Label), size = 4)
+    if (isTRUE(auto_label_color)) {
+      # Build a function that maps Value -> hex fill color using the same palette choice
+      rng <- range(df$Value, na.rm = TRUE)
+      if (!all(is.finite(rng)) || diff(rng) == 0) {
+        df$LabelColor <- label_color_light
+      } else {
+        t <- (df$Value - rng[1]) / (rng[2] - rng[1])  # 0..1
+        
+        # compute colors for each tile based on palette type
+        get_hex <- function(tt) {
+          tt <- pmax(0, pmin(1, tt))
+          if (palette_type == "viridis") {
+            if (is.null(palette_name)) palette_name <- "viridis"
+            return(viridisLite::viridis(length(tt), option = palette_name)[pmax(1, ceiling(tt * length(tt)))])
+          }
+          if (palette_type == "brewer") {
+            if (is.null(palette_name)) palette_name <- "Blues"
+            cols <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(9, palette_name))(256)
+            return(cols[pmax(1, floor(tt * 255) + 1)])
+          }
+          if (palette_type == "gradient") {
+            if (!is.null(gradient_mid)) {
+              cols <- grDevices::colorRampPalette(c(gradient_low, gradient_mid, gradient_high))(256)
+            } else {
+              cols <- grDevices::colorRampPalette(c(gradient_low, gradient_high))(256)
+            }
+            return(cols[pmax(1, floor(tt * 255) + 1)])
+          }
+          if (palette_type == "base") {
+            if (is.null(palette_name)) palette_name <- "heat"
+            pal_fun <- switch(
+              tolower(palette_name),
+              "rainbow" = grDevices::rainbow,
+              "heat"    = grDevices::heat.colors,
+              "terrain" = grDevices::terrain.colors,
+              "topo"    = grDevices::topo.colors,
+              "cm"      = grDevices::cm.colors
+            )
+            cols <- pal_fun(256)
+            return(cols[pmax(1, floor(tt * 255) + 1)])
+          }
+          
+          # default fallback similar to ggplot default
+          cols <- grDevices::colorRampPalette(c("white", "#132B43"))(256)
+          cols[pmax(1, floor(tt * 255) + 1)]
+        }
+        
+        hex <- get_hex(t)
+        
+        # luminance: choose white text on dark fills, black text on light fills
+        rgb <- grDevices::col2rgb(hex) / 255
+        lum <- 0.2126 * rgb[1, ] + 0.7152 * rgb[2, ] + 0.0722 * rgb[3, ]
+        df$LabelColor <- ifelse(lum < 0.5, label_color_dark, label_color_light)
+        df$LabelColor[is.na(df$Value)] <- label_color_light
+      }
+      
+      p <- p + ggplot2::geom_text(
+        data = df,
+        ggplot2::aes(label = Label, color = LabelColor),
+        size = label_size,
+        show.legend = FALSE
+      ) + ggplot2::scale_color_identity()
+    } else {
+      p <- p + ggplot2::geom_text(ggplot2::aes(label = Label), size = label_size)
+    }
   }
   
   if (isTRUE(flip_y)) {
@@ -1169,3 +1365,4 @@ plot_confusion_matrix <- function(cm,
   print(p)
   invisible(p)
 }
+
