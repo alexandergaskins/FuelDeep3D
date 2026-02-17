@@ -1072,15 +1072,29 @@ print_confusion_matrix <- function(x,
 #' Creates a heatmap visualization of a confusion matrix. If \code{row_normalize = TRUE},
 #' each row is converted to proportions so rows sum to 1.
 #'
-#' @param cm Confusion matrix (table or matrix).
-#' @param las_name Optional character. If provided, appended to the title.
-#' @param title Character. Plot title.
-#' @param row_normalize Logical. If \code{TRUE}, normalize each row to proportions.
-#' @param digits Integer. Rounding digits for displayed values when \code{row_normalize = TRUE}.
-#' @param show_values Logical. If \code{TRUE}, draw numbers in each cell.
-#' @param class_names Optional class name mapping (named or unnamed).
-#' @param show_codes Logical. If \code{TRUE}, axis labels include codes like \code{"0 (Ground)"}.
-#' @param flip_y Logical. If \code{TRUE}, show first class at the top (common confusion-matrix style).
+#' @param palette_type Character. Color palette strategy for the heatmap.
+#'   Common options include \code{"viridis"}, \code{"brewer"}, and \code{"gradient"}.
+#' @param palette_name Character. Palette name used when \code{palette_type} supports
+#'   named palettes (e.g., viridis option name or RColorBrewer palette name).
+#' @param brewer_direction Integer. Direction for RColorBrewer palettes.
+#'   Use \code{1} for default direction, \code{-1} to reverse.
+#' @param gradient_low Character. Low-end color for \code{palette_type="gradient"}.
+#'   Can be any valid R color (e.g., \code{"white"} or \code{"#FFFFFF"}).
+#' @param gradient_mid Character. Mid-point color for \code{palette_type="gradient"}.
+#'   Can be any valid R color.
+#' @param gradient_high Character. High-end color for \code{palette_type="gradient"}.
+#'   Can be any valid R color.
+#' @param base_n Integer. Number of colors to generate for discrete palettes
+#'   (used when generating a ramp for the heatmap).
+#' @param na_fill Character. Fill color used for \code{NA} cells in the heatmap.
+#' @param label_size Numeric. Text size for cell labels (counts/percentages) and/or axis labels,
+#'   depending on your implementation.
+#' @param auto_label_color Logical. If \code{TRUE}, automatically chooses a readable label
+#'   text color based on the cell fill (improves contrast).
+#' @param label_color_dark Character. Label text color to use on light cells when
+#'   \code{auto_label_color=TRUE}.
+#' @param label_color_light Character. Label text color to use on dark cells when
+#'   \code{auto_label_color=TRUE}.
 #'
 #' @return A ggplot object (invisibly).
 #'
@@ -1349,7 +1363,7 @@ plot_confusion_matrix <- function(cm,
       
       p <- p + ggplot2::geom_text(
         data = df,
-        ggplot2::aes(label = Label, color = LabelColor),
+        ggplot2::aes(label = Label, color = data$LabelColor),
         size = label_size,
         show.legend = FALSE
       ) + ggplot2::scale_color_identity()

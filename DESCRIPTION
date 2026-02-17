@@ -24,7 +24,11 @@ Description: Provides tools for preprocessing, feature extraction, and segmentat
 Depends:
     R (>= 4.1)
 Imports:
-    stats
+    stats,
+    RColorBrewer,
+    viridisLite,
+    scales,
+    rlang
 Suggests:
     lidR,
     reticulate,
