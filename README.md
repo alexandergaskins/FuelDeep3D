@@ -393,7 +393,7 @@ FuelDeep3D includes evaluation utilities to measure segmentation quality using L
   ```
 
 <p align="center">
-  <img src="inst/readme/heat_map_1.png" alt="Confusion Matrix" width="45%">
+  <img src="inst/readme/confusion_matrix.png" alt="Confusion Matrix" width="45%">
 </p>
 
    Row-normalized heatmap (proportion per true class; easier to compare classes)
@@ -406,7 +406,7 @@ FuelDeep3D includes evaluation utilities to measure segmentation quality using L
   )
   ```
 <p align="center">
-  <img src="inst/readme/heat_map_2.png" alt="Confusion Matrix" width="45%">
+  <img src="inst/readme/confusion_matrix_row_norm.png" alt="Confusion Matrix" width="45%">
 </p>
 
 
@@ -415,7 +415,20 @@ FuelDeep3D includes evaluation utilities to measure segmentation quality using L
   ### 5.5 Class Distribution Summary
 
   ```r
-  class_summary(las)
+  las <- lidR::readLAS("C:/path/to/your_file.laz")
+
+  # Predicted class summary
+  las_class_distribution(las, field = "Classification")
+  
+  # Raw/original label summary
+  las_class_distribution(las, field = "label")
+  
+  # With readable names
+  labs <- c("0"="Ground vegetation", "1"="Branch/Stem", "2"="Leaves/Foliage")
+  las_class_distribution(las, field = "Classification", class_labels = labs)
+  
+  # Drop NA class (if any)
+  las_class_distribution(las, field = "Classification", include_na = FALSE)
   ```
 
   Shows how many points belong to each predicted class.

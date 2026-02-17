@@ -744,7 +744,7 @@ plot_las_3d <- function(las,
 #' @examples
 #' \dontrun{
 #' library(lidR)
-#' las <- readLAS("C:/Users/vs.naga/Documents/Github/FuelDeep3D/inst/extdata/las/trees.laz")
+#' las <- readLAS("C:/path/to/your_file.laz")
 #'
 #' res <- evaluate_single_las(
 #'   las,
@@ -997,7 +997,7 @@ remove_noise_sor <- function(las,
 #' @examples
 #' \dontrun{
 #' library(lidR)
-#' las <- readLAS("C:/Users/vs.naga/Documents/Github/FuelDeep3D/inst/extdata/las/trees.laz")
+#' las <- readLAS("C:/path/to/your_file.laz")
 #'
 #' print_confusion_matrix(
 #'   las,
@@ -1089,7 +1089,7 @@ print_confusion_matrix <- function(x,
 #' library(lidR)
 #'
 #' # Read LAS/LAZ
-#' las <- readLAS("C:/Users/vs.naga/Documents/Github/FuelDeep3D/inst/extdata/las/trees.laz")
+#' las <- readLAS("C:/path/to/your_file.laz")
 #'
 #' # Confusion matrix: True labels vs Predicted class (LAS Classification)
 #' cm <- table(True = las@data$label, Pred = las@data$Classification)
