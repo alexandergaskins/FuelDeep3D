@@ -260,7 +260,7 @@
 #'
 #' # 3) Named custom colors (stable mapping)
 #' my_cols <- c("0"="#1F77B4", "1"="#8B4513", "2"="#228B22")
-#' my_labs <- c("0"="Ground vegetation", "1"="Branch/Stem", "2"="Leaves/Foliage")
+#' my_labs <- c("0"="Ground vegetation", "1"="Leaves/Foliage", "2"="Branch/Stem")
 #' plot_las_class_3d(
 #'   las,
 #'   field = "Classification",

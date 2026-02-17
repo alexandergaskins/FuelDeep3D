@@ -1104,7 +1104,7 @@ print_confusion_matrix <- function(x,
 #'   row_normalize = TRUE,
 #'   las_name = "trees.laz",
 #'   title = "Confusion Matrix (Row-normalized)",
-#'   class_names = c("0" = "Ground", "1" = "Branch", "2" = "Leaves"),
+#'   class_names = c("0" = "Ground", "1" = "Leaves", "2" = "Branch"),
 #'   palette_type = "viridis",
 #'   palette_name = "cividis"
 #' )
@@ -1119,7 +1119,7 @@ print_confusion_matrix <- function(x,
 #'   row_normalize = FALSE,
 #'   las_name = "trees.laz",
 #'   title = "Confusion Matrix (Counts)",
-#'   class_names = c("0" = "Ground", "1" = "Branch", "2" = "Leaves"),
+#'   class_names = c("0" = "Ground", "1" = "Leaves", "2" = "Branch"),
 #'   palette_type = "viridis",
 #'   palette_name = "viridis"
 #' )
@@ -1133,7 +1133,7 @@ print_confusion_matrix <- function(x,
 #'   row_normalize = TRUE,
 #'   las_name = "trees.laz",
 #'   title = "Confusion Matrix (Brewer Blues, Row-normalized)",
-#'   class_names = c("0" = "Ground", "1" = "Branch", "2" = "Leaves"),
+#'   class_names = c("0" = "Ground", "1" = "Leaves", "2" = "Branch"),
 #'   palette_type = "brewer",
 #'   palette_name = "Blues"
 #' )
@@ -1146,7 +1146,7 @@ print_confusion_matrix <- function(x,
 #'   row_normalize = TRUE,
 #'   las_name = "trees.laz",
 #'   title = "Confusion Matrix (Custom Gradient, Row-normalized)",
-#'   class_names = c("0" = "Ground", "1" = "Branch", "2" = "Leaves"),
+#'   class_names = c("0" = "Ground", "1" = "Leaves", "2" = "Branch"),
 #'   palette_type = "gradient",
 #'   gradient_low  = "white",
 #'   gradient_high = "#2C3E50"
@@ -1161,7 +1161,7 @@ print_confusion_matrix <- function(x,
 #'   row_normalize = TRUE,
 #'   las_name = "trees.laz",
 #'   title = "Confusion Matrix (Base heat, Row-normalized)",
-#'   class_names = c("0" = "Ground", "1" = "Branch", "2" = "Leaves"),
+#'   class_names = c("0" = "Ground", "1" = "Leaves", "2" = "Branch"),
 #'   palette_type = "base",
 #'   palette_name = "heat"
 #' )
@@ -1408,7 +1408,7 @@ plot_confusion_matrix <- function(cm,
 #' las_class_distribution(las, field = "label")
 #'
 #' # 3) With human-readable names
-#' labs <- c("0"="Ground vegetation", "1"="Branch/Stem", "2"="Leaves/Foliage")
+#' labs <- c("0"="Ground vegetation", "1"="Foliage", "2"="Branches")
 #' las_class_distribution(las, field = "Classification", class_labels = labs)
 #'
 #' # 4) Drop NA rows if you don't want them

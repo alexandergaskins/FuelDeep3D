@@ -62,7 +62,7 @@ las_class_distribution(las, field = "Classification")
 las_class_distribution(las, field = "label")
 
 # 3) With human-readable names
-labs <- c("0"="Ground vegetation", "1"="Branch/Stem", "2"="Leaves/Foliage")
+labs <- c("0"="Ground vegetation", "1"="Foliage", "2"="Branches")
 las_class_distribution(las, field = "Classification", class_labels = labs)
 
 # 4) Drop NA rows if you don't want them
