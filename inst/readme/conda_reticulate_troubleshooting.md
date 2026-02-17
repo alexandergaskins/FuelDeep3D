@@ -1,4 +1,4 @@
-# Conda + R (reticulate) Troubleshooting Guide (Copy/Paste Ready)
+# Conda + R (reticulate) Troubleshooting Guide
 
 This guide helps you confirm **which Conda** and **which Python** are being used by:
 - your **terminal** (CMD/PowerShell/macOS/Linux shell)
@@ -14,7 +14,7 @@ It also shows **expected outputs** and what to do if the outputs are wrong.
 You want **Terminal Python** and **R/reticulate Python** to point to the **same Conda env**.
 
 Example env name:
-- `<your_env>`
+- `<your_env>` or `<pointnext>`
 
 Example correct Python paths:
 - **Windows:** `C:\Users\...\anaconda3\envs\<your_env>\python.exe`

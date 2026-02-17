@@ -13,7 +13,19 @@ plot_confusion_matrix(
   show_values = TRUE,
   class_names = NULL,
   show_codes = FALSE,
-  flip_y = TRUE
+  flip_y = TRUE,
+  palette_type = c("default", "viridis", "brewer", "gradient", "base"),
+  palette_name = NULL,
+  brewer_direction = 1,
+  gradient_low = "white",
+  gradient_high = "#132B43",
+  gradient_mid = NULL,
+  base_n = 256,
+  na_fill = "grey90",
+  label_size = 4,
+  auto_label_color = TRUE,
+  label_color_dark = "white",
+  label_color_light = "black"
 )
 }
 \arguments{
@@ -45,15 +57,83 @@ each row is converted to proportions so rows sum to 1.
 \examples{
 \dontrun{
 library(lidR)
+
+# Read LAS/LAZ
 las <- readLAS("C:/Users/vs.naga/Documents/Github/FuelDeep3D/inst/extdata/las/trees.laz")
 
+# Confusion matrix: True labels vs Predicted class (LAS Classification)
 cm <- table(True = las@data$label, Pred = las@data$Classification)
 
+# ------------------------------------------------------------
+# 1) Row-normalized confusion matrix (Proportions)
+#    - Best to understand per-class recall behavior
+#    - row_normalize = TRUE is important here
+# ------------------------------------------------------------
 plot_confusion_matrix(
   cm,
   row_normalize = TRUE,
   las_name = "trees.laz",
-  class_names = c("0"="Ground","1"="Branch","2"="Leaves")
+  title = "Confusion Matrix (Row-normalized)",
+  class_names = c("0" = "Ground", "1" = "Branch", "2" = "Leaves"),
+  palette_type = "viridis",
+  palette_name = "cividis"
+)
+
+# ------------------------------------------------------------
+# 2) Counts confusion matrix (Raw counts)
+#    - Shows absolute misclassification volume
+#    - row_normalize = FALSE is important here
+# ------------------------------------------------------------
+plot_confusion_matrix(
+  cm,
+  row_normalize = FALSE,
+  las_name = "trees.laz",
+  title = "Confusion Matrix (Counts)",
+  class_names = c("0" = "Ground", "1" = "Branch", "2" = "Leaves"),
+  palette_type = "viridis",
+  palette_name = "viridis"
+)
+
+# ------------------------------------------------------------
+# 3) Brewer palette example (soft + classic)
+#    - Works great for both normalized and counts
+# ------------------------------------------------------------
+plot_confusion_matrix(
+  cm,
+  row_normalize = TRUE,
+  las_name = "trees.laz",
+  title = "Confusion Matrix (Brewer Blues, Row-normalized)",
+  class_names = c("0" = "Ground", "1" = "Branch", "2" = "Leaves"),
+  palette_type = "brewer",
+  palette_name = "Blues"
+)
+
+# ------------------------------------------------------------
+# 4) Custom modern gradient (minimal + professional)
+# ------------------------------------------------------------
+plot_confusion_matrix(
+  cm,
+  row_normalize = TRUE,
+  las_name = "trees.laz",
+  title = "Confusion Matrix (Custom Gradient, Row-normalized)",
+  class_names = c("0" = "Ground", "1" = "Branch", "2" = "Leaves"),
+  palette_type = "gradient",
+  gradient_low  = "white",
+  gradient_high = "#2C3E50"
+)
+
+# ------------------------------------------------------------
+# 5) Base palette example (if you still want them)
+#    - heat / terrain / topo / cm / rainbow
+# ------------------------------------------------------------
+plot_confusion_matrix(
+  cm,
+  row_normalize = TRUE,
+  las_name = "trees.laz",
+  title = "Confusion Matrix (Base heat, Row-normalized)",
+  class_names = c("0" = "Ground", "1" = "Branch", "2" = "Leaves"),
+  palette_type = "base",
+  palette_name = "heat"
 )
 }
 }
