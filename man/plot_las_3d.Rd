@@ -2,90 +2,156 @@
 % Please edit documentation in R/utils.R
 \name{plot_las_3d}
 \alias{plot_las_3d}
-\title{3D visualization of a LAS object colored by height (Z) using rgl}
+\title{Plot a 3D LAS point cloud colored by elevation}
 \usage{
 plot_las_3d(
   las,
   bg = "black",
   zlim = NULL,
   height_palette = NULL,
-  size = 2,
-  max_points = 200000L,
-  title = "LAS 3D View"
+  size = 0.6,
+  max_points = 400000L,
+  title = "LAS 3D View",
+  center = FALSE,
+  add_legend = TRUE,
+  legend_height_frac = 0.5,
+  legend_width_frac = 0.015,
+  legend_xpad_frac = 0.03,
+  legend_side = "right",
+  legend_pos = c(NA_real_, NA_real_),
+  legend_label_mode = c("rel_z", "norm_z", "z", "norm"),
+  z_digits = 2L,
+  z_unit = "m",
+  size_by_height = TRUE,
+  size_range = c(1, 4),
+  size_power = 1.2,
+  zoom = 0.7,
+  theta = 0,
+  phi = -90
 )
 }
 \arguments{
-\item{las}{A \code{\link[lidR]{LAS}} object.}
+\item{las}{A \code{lidR::LAS} object.}
 
-\item{bg}{Character. Background color passed to \code{rgl::bg3d()}. Common values include
-\code{"black"} and \code{"white"}.}
+\item{bg}{Background color for the \pkg{rgl} scene. (e.g., \code{"black"}, \code{"white"}, \code{"#111111"}).}
 
-\item{zlim}{Numeric vector of length 2 (e.g., \code{c(0, 35)}) giving the height range used for
-color mapping. Values outside this range are clamped. If \code{NULL}, the observed range is used.}
+\item{zlim}{NULL or numeric length-2 vector giving the Z range used for coloring (values are clamped to this range).}
 
-\item{height_palette}{Character vector of colors used to build the height color ramp.
-If \code{NULL}, a default sequential palette is used.}
+\item{height_palette}{Vector of colors to define the height color ramp
+(e.g., \code{c("purple","blue","cyan","yellow","red")}).}
 
-\item{size}{Numeric. Point size passed to \code{rgl::points3d()}.}
+\item{size}{Numeric. Base point size (thickness). If \code{size_by_height = TRUE}, this acts as a multiplier on \code{size_range}.}
 
-\item{max_points}{Integer. Maximum number of points to plot. If the LAS contains more than
-\code{max_points}, a random subset of size \code{max_points} is drawn for faster rendering.
-Use \code{NULL} to plot all points (may be slow for large clouds).}
+\item{max_points}{Integer. If LAS has more than this many points, a random subsample is plotted for speed.
+Use NULL to disable subsampling.}
 
-\item{title}{Character. Title shown in the 3D window (via \code{rgl::title3d()}).}
+\item{title}{Character. Plot title (converted to ASCII-safe to avoid \pkg{rgl} text errors).}
+
+\item{center}{Logical. If TRUE, shifts X/Y/Z so minima become 0 (helps visualization when coordinates are large).}
+
+\item{add_legend}{Logical. If TRUE, draws a vertical colorbar and min/max labels.}
+
+\item{legend_height_frac}{Numeric in (0,1]. Visually compress legend height (e.g., 0.5 = half height).}
+
+\item{legend_width_frac}{Numeric. Legend width as a fraction of X-range.}
+
+\item{legend_xpad_frac}{Numeric. Legend x-offset as a fraction of X-range.}
+
+\item{legend_side}{Character. Either \code{"right"} or \code{"left"}.}
+
+\item{legend_pos}{Numeric length-2 vector \code{c(x, y)} to override legend base position (use NA to ignore a coordinate).}
+
+\item{legend_label_mode}{Character. One of \code{"norm_z"}, \code{"z"}, or \code{"norm"}.}
+
+\item{z_digits}{Integer. Number of digits used for legend Z labels.}
+
+\item{z_unit}{Character. Unit label appended to legend Z values (e.g., \code{"m"}). Use \code{""} for none.}
+
+\item{size_by_height}{Logical. If TRUE, point thickness increases with height.}
+
+\item{size_range}{Numeric length-2. Min/max point size (before multiplying by \code{size}) when \code{size_by_height = TRUE}.}
+
+\item{size_power}{Numeric > 0. Controls how quickly thickness increases with height (larger = more emphasis at top).}
+
+\item{zoom, theta, phi}{Camera controls passed to \code{rgl::view3d()}.}
 }
 \value{
-Invisibly returns \code{NULL}.
+Invisibly returns NULL.
 }
 \description{
-Opens an interactive \pkg{rgl} 3D window and plots a \code{\link[lidR]{LAS}} point cloud,
-coloring points by their height (\code{Z}). The background color and the height range used
-for coloring can be customized. For large point clouds, \code{max_points} can be used to
-subsample points for faster rendering.
+Visualize a \code{lidR::LAS} point cloud in 3D using \pkg{rgl}, with points colored by elevation (Z).
+Supports subsampling for performance, custom height color ramps, optional coordinate centering,
+an optional compact legend, and optional "thickness by height" (points become larger at higher Z).
 }
 \details{
-Points are colored using their \code{Z} (height) values mapped to a continuous color gradient.
-
+\strong{Color mapping}
 \itemize{
-\item \strong{Height scaling (\code{zlim})}: If \code{zlim = c(zmin, zmax)} is provided,
-\code{Z} values are clamped to \code{[zmin, zmax]} before mapping to colors. This prevents
-extreme outliers from dominating the color scale and helps preserve contrast in the
-understory/canopy.
-
-\item \strong{Automatic range}: If \code{zlim = NULL}, the observed \code{Z} range
-(after any optional subsampling) is used automatically.
-
-\item \strong{Custom palettes (\code{height_palette})}: You can provide a vector of colors
-(e.g., \code{c("purple","blue","cyan","yellow","red")}) to define the height color ramp.
-
-\item \strong{Performance (\code{max_points})}: Rendering millions of points can be slow.
-If \code{max_points} is set and the LAS has more points than this value, points are randomly
-subsampled (without modifying the original LAS object) to improve interactivity.
+\item Elevations are optionally clamped to \code{zlim} and normalized to \eqn{[0,1]} for palette lookup.
+\item When \code{zlim} is provided, values outside the range are clamped so the color scale stays comparable.
 }
 
-This function is intentionally skipped during \code{R CMD check} to avoid interactive graphics
-in CRAN checks.
+\strong{Legend}
+\itemize{
+\item The legend shows the same color scale as used for points.
+\item When \code{legend_label_mode = "norm_z"}, labels are shown as
+\code{norm=0 (z = ...)} and \code{norm=1 (z = ...)} to clarify that 0/1 refers to the normalized scale.
+\item Use \code{legend_height_frac} to shorten the legend visually (e.g., 0.5 = half height).
+}
+
+\strong{CRAN / non-interactive environments}
+\itemize{
+\item During \code{R CMD check}, the function returns early (no \pkg{rgl} window is opened).
+\item If \pkg{rgl} is not installed, a warning is raised and the function returns invisibly.
+}
 }
 \examples{
-\donttest{
+\dontrun{
 library(lidR)
-las <- readLAS(system.file("extdata", "las", "tree2.laz", package = "FuelDeep3D"))
-if (!lidR::is.empty(las)) {
-  # Black background, color from 0 to 35 height units
-  plot_las_3d(las, bg = "black", zlim = c(0, 35), size = 2, max_points = 200000)
 
-  # White background, automatic height range
-  plot_las_3d(las, bg = "white", zlim = NULL, size = 2, max_points = 100000)
+las <- readLAS("path/to/your_file.laz")
 
-  # Custom height palette
-  plot_las_3d(
-    las,
-    bg = "black",
-    zlim = c(0, 35),
-    height_palette = c("purple", "blue", "cyan", "yellow", "red"),
-    max_points = 150000
-  )
+# 1) Default plot (black bg, legend on, thickness by height)
+plot_las_3d(las)
+
+# 2) Custom palette + white background
+plot_las_3d(
+  las,
+  bg = "white",
+  height_palette = c("purple","blue","cyan","yellow","red"),
+  title = "Custom palette"
+)
+
+# 3) Fixed Z color scale for comparisons + no legend
+plot_las_3d(
+  las,
+  zlim = c(0, 40),
+  add_legend = FALSE,
+  title = "Fixed Z (0-40), no legend"
+)
+
+# 4) Turn OFF thickness-by-height; use a single point size
+plot_las_3d(
+  las,
+  size_by_height = FALSE,
+  size = 4,
+  title = "Uniform thicker points"
+)
+
+# 5) Legend on the LEFT and thicker legend bar
+plot_las_3d(
+  las,
+  legend_side = "left",
+  legend_width_frac = 0.05,
+  title = "Legend left"
+)
+
+# 6) Make everything thicker (multiplies size_range when size_by_height=TRUE)
+plot_las_3d(
+  las,
+  size = 1.8,
+  size_range = c(1, 7),
+  size_power = 1.2,
+  title = "Thicker points by height"
+)
 }
-}
-
 }

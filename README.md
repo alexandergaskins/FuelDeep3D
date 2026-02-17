@@ -2,13 +2,16 @@
   <img src="inst/readme/banner.png" alt="Single tree segmentation output" width="100%">
 </p>
 
-[![R-hub](https://github.com/venkatasivanaga/FuelDeep3D/.github/workflows/r.yml/badge.svg)](https://github.com/venkatasivanaga/FuelDeep3D/actions/workflows/rhub.yaml)
+<!-- This is a comment. [![R-hub](https://github.com/venkatasivanaga/FuelDeep3D/.github/workflows/r.yml/badge.svg)](https://github.com/venkatasivanaga/FuelDeep3D/actions/workflows/rhub.yaml)  --> 
+
+[![R-CMD-check](https://github.com/venkatasivanaga/FuelDeep3D/actions/workflows/r.yml/badge.svg?branch=main)](https://github.com/venkatasivanaga/FuelDeep3D/actions/workflows/r.yml)
 [![CRAN](https://www.r-pkg.org/badges/version/FuelDeep3D)](https://cran.r-project.org/package=FuelDeep3D)
 ![GitHub](https://img.shields.io/badge/GitHub-0.1.0-green.svg)
 ![licence](https://img.shields.io/badge/Licence-GPL--3-blue.svg)
 ![Downloads](https://cranlogs.r-pkg.org/badges/grand-total/FuelDeep3D)
 [![Build Status](https://app.travis-ci.com/venkatasivanaga/FuelDeep3D.svg?branch=main)](https://app.travis-ci.com/venkatasivanaga/FuelDeep3D)
-[![FuelDeep3D statusbadge](https://venkatasivanaga.dev/badges/FuelDeep3D)](https://venkatasivanaga.r-universe.dev/FuelDeep3D)
+
+<!-- This is a comment. [![FuelDeep3D statusbadge](https://venkatasivanaga.dev/badges/FuelDeep3D)](https://venkatasivanaga.r-universe.dev/FuelDeep3D)  --> 
 
 # FuelDeep3D: An R package for Fire Fuels Segmentation in 3D Using Terrestrial Laser Scanning and Deep Learning  
 
@@ -100,6 +103,9 @@ ensure_py_env("pointnext")   # creates env + installs deps the first time
 py_config()
 
 ```
+
+> **Note (Troubleshooting):** If you run into any Conda/reticulate issues while creating or activating the `pointnext` environment (e.g., R picks the wrong Python, `py_config()` shows an unexpected interpreter, or you see missing-module/DLL errors), refer to the **[Conda + R (reticulate) Troubleshooting Guide](inst/readme/conda_reticulate_troubleshooting.md)** for step-by-step diagnostics and fixes.
+
 ---
 
 ## 2. Visualization of a 3D point cloud
@@ -422,7 +428,12 @@ FuelDeep3D includes evaluation utilities to measure segmentation quality using L
 
 # Acknowledgements
 
-We gratefully acknowledge ------------
+FuelDeep3D was supported by the following projects and programs:
+
+- **ESTCP – FuelsCraft:** An innovative wildland fuel mapping tool for prescribed fire decision support on Department of Defense military installations (**#RC23-7779**)
+- **EMS4D:** MultiScale Fuel Mapping and Decision Support System for the Next Generation of Fire Management (**#22-2-02-15**)
+- **NASA:** ICESat-2 (**Grant #80NSSC23K0941**), Carbon Monitoring System (CMS; **Grant #80NSSC23K1257**), and Commercial Smallsat Data Scientific Analysis (CSDSA; **Grant #80NSSC24K0055**)
+- **Object-Based Aggregation of Fuel Structures, Physics-Based Fire Behavior and Self-Organizing Smoke Plumes for Improved Fuel, Fire, and Smoke Management on Military Lands** (**#RC20-1346**)
 
 # Reporting Issues
 
