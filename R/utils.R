@@ -1366,3 +1366,106 @@ plot_confusion_matrix <- function(cm,
   invisible(p)
 }
 
+#' Class distribution summary for a LAS point cloud
+#'
+#' Computes how many points belong to each class value in a given LAS attribute
+#' field (e.g., predicted classes stored in \code{Classification}, or original
+#' labels stored in \code{label}). Returns a tidy \code{data.frame} with counts
+#' and percentages.
+#'
+#' This is useful after prediction to quickly inspect class balance and verify
+#' that classes look reasonable (e.g., not all points predicted as one class).
+#'
+#' @param las A \code{LAS} object from \code{lidR}.
+#' @param field Character. Column name in \code{las@data} containing class values
+#'   (e.g., \code{"Classification"}, \code{"label"}).
+#' @param class_labels Optional. A named character vector mapping class values
+#'   to human-readable names, e.g. \code{c("0"="Ground","1"="Stem","2"="Crown")}.
+#'   Names must match the class values as characters.
+#' @param include_na Logical. If \code{TRUE} (default), includes \code{NA} as a
+#'   separate row (shown as class \code{"<NA>"}). If \code{FALSE}, drops NA values.
+#' @param sort_by Character. Sort rows by \code{"n_points"} (default),
+#'   \code{"class"}, or \code{"percent"}.
+#' @param decreasing Logical. If \code{TRUE} (default), sorts descending.
+#'
+#' @return A \code{data.frame} with columns:
+#' \describe{
+#'   \item{class}{Class value as character (NA shown as \code{"<NA>"})}
+#'   \item{name}{(Optional) human-readable name if \code{class_labels} provided}
+#'   \item{n_points}{Number of points in that class}
+#'   \item{percent}{Percent of total points in that class}
+#' }
+#'
+#' @examples
+#' \dontrun{
+#' library(lidR)
+#' las <- readLAS("your_file.laz")
+#'
+#' # 1) Predicted distribution (common case)
+#' las_class_distribution(las, field = "Classification")
+#'
+#' # 2) Raw label distribution
+#' las_class_distribution(las, field = "label")
+#'
+#' # 3) With human-readable names
+#' labs <- c("0"="Ground vegetation", "1"="Branch/Stem", "2"="Leaves/Foliage")
+#' las_class_distribution(las, field = "Classification", class_labels = labs)
+#'
+#' # 4) Drop NA rows if you don't want them
+#' las_class_distribution(las, field = "Classification", include_na = FALSE)
+#' }
+#'
+#' @export
+las_class_distribution <- function(las,
+                                   field = "Classification",
+                                   class_labels = NULL,
+                                   include_na = TRUE,
+                                   sort_by = c("n_points", "class", "percent"),
+                                   decreasing = TRUE) {
+  if (!requireNamespace("lidR", quietly = TRUE)) {
+    stop("Package 'lidR' is required.", call. = FALSE)
+  }
+  stopifnot(inherits(las, "LAS"))
+  
+  if (!field %in% names(las@data)) {
+    stop(sprintf("Field '%s' not found in las@data.", field), call. = FALSE)
+  }
+  
+  sort_by <- match.arg(sort_by)
+  
+  v <- las@data[[field]]
+  
+  if (isFALSE(include_na)) {
+    v <- v[!is.na(v)]
+  }
+  
+  tab <- table(v, useNA = if (isTRUE(include_na)) "ifany" else "no")
+  n_total <- sum(tab)
+  
+  classes <- names(tab)
+  # table() uses "<NA>" label for NA bucket on many setups; normalize explicitly
+  classes[is.na(classes)] <- "<NA>"
+  
+  df <- data.frame(
+    class = classes,
+    n_points = as.integer(tab),
+    percent = round(100 * as.integer(tab) / n_total, 2),
+    stringsAsFactors = FALSE
+  )
+  
+  if (!is.null(class_labels)) {
+    if (is.null(names(class_labels)) || any(names(class_labels) == "")) {
+      stop("class_labels must be a NAMED character vector like c('0'='Ground').", call. = FALSE)
+    }
+    df$name <- unname(class_labels[df$class])
+  }
+  
+  o <- switch(
+    sort_by,
+    n_points = order(df$n_points, decreasing = decreasing),
+    percent  = order(df$percent,  decreasing = decreasing),
+    class    = order(df$class,    decreasing = decreasing)
+  )
+  df[o, , drop = FALSE]
+}
+
