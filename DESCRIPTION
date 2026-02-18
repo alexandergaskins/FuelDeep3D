@@ -27,7 +27,6 @@ Imports:
     stats,
     RColorBrewer,
     viridisLite,
-    scales,
     rlang
 Suggests:
     lidR,
@@ -35,7 +34,8 @@ Suggests:
     dbscan,
     ggplot2,
     rgl,
-    RCSF
+    RCSF,
+    scales
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true

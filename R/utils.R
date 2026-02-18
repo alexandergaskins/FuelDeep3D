@@ -1072,6 +1072,8 @@ print_confusion_matrix <- function(x,
 #' Creates a heatmap visualization of a confusion matrix. If \code{row_normalize = TRUE},
 #' each row is converted to proportions so rows sum to 1.
 #'
+#' @importFrom rlang .data
+#' 
 #' @param palette_type Character. Color palette strategy for the heatmap.
 #'   Common options include \code{"viridis"}, \code{"brewer"}, and \code{"gradient"}.
 #' @param palette_name Character. Palette name used when \code{palette_type} supports
@@ -1095,6 +1097,16 @@ print_confusion_matrix <- function(x,
 #'   \code{auto_label_color=TRUE}.
 #' @param label_color_light Character. Label text color to use on dark cells when
 #'   \code{auto_label_color=TRUE}.
+##' @param cm A confusion matrix (table or matrix). Rows = true class, columns = predicted class.
+#' @param las_name Optional character. A short LAS/LAZ filename label appended to the title.
+#' @param title Character. Plot title.
+#' @param row_normalize Logical. If TRUE, normalize each row so it sums to 1 (proportions).
+#' @param digits Integer. Number of decimal digits to show when row_normalize = TRUE.
+#' @param show_values Logical. If TRUE, print values inside cells.
+#' @param class_names Optional named character vector mapping class codes to readable names.
+#'   Example: c("0"="Ground","1"="Leaves","2"="Branch").
+#' @param show_codes Logical. If TRUE, show both code + name on axes (e.g., "1 - Stem").
+#' @param flip_y Logical. If TRUE, reverses y-axis order (often looks more like a typical CM).
 #'
 #' @return A ggplot object (invisibly).
 #'
@@ -1363,10 +1375,11 @@ plot_confusion_matrix <- function(cm,
       
       p <- p + ggplot2::geom_text(
         data = df,
-        ggplot2::aes(label = Label, color = data$LabelColor),
+        ggplot2::aes(label = .data$Label, color = .data$LabelColor),
         size = label_size,
         show.legend = FALSE
       ) + ggplot2::scale_color_identity()
+    
     } else {
       p <- p + ggplot2::geom_text(ggplot2::aes(label = Label), size = label_size)
     }
