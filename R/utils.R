@@ -487,7 +487,7 @@ evaluate_two_las <- function(truth_las,
 #' }
 #'
 #' @export
-plot_3d <- function(las,
+plot_las_3d <- function(las,
                         bg = "black",
                         zlim = NULL,
                         height_palette = NULL,
