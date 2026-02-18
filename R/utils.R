@@ -442,10 +442,10 @@ evaluate_two_las <- function(truth_las,
 #' las <- readLAS("path/to/your_file.laz")
 #'
 #' # 1) Default plot (black bg, legend on, thickness by height)
-#' plot_las_3d(las)
+#' plot_3d(las)
 #'
 #' # 2) Custom palette + white background
-#' plot_las_3d(
+#' plot_3d(
 #'   las,
 #'   bg = "white",
 #'   height_palette = c("purple","blue","cyan","yellow","red"),
@@ -453,7 +453,7 @@ evaluate_two_las <- function(truth_las,
 #' )
 #'
 #' # 3) Fixed Z color scale for comparisons + no legend
-#' plot_las_3d(
+#' plot_3d(
 #'   las,
 #'   zlim = c(0, 40),
 #'   add_legend = FALSE,
@@ -461,7 +461,7 @@ evaluate_two_las <- function(truth_las,
 #' )
 #'
 #' # 4) Turn OFF thickness-by-height; use a single point size
-#' plot_las_3d(
+#' plot_3d(
 #'   las,
 #'   size_by_height = FALSE,
 #'   size = 4,
@@ -469,7 +469,7 @@ evaluate_two_las <- function(truth_las,
 #' )
 #'
 #' # 5) Legend on the LEFT and thicker legend bar
-#' plot_las_3d(
+#' plot_3d(
 #'   las,
 #'   legend_side = "left",
 #'   legend_width_frac = 0.05,
@@ -477,7 +477,7 @@ evaluate_two_las <- function(truth_las,
 #' )
 #'
 #' # 6) Make everything thicker (multiplies size_range when size_by_height=TRUE)
-#' plot_las_3d(
+#' plot_3d(
 #'   las,
 #'   size = 1.8,
 #'   size_range = c(1, 7),
@@ -485,7 +485,9 @@ evaluate_two_las <- function(truth_las,
 #'   title = "Thicker points by height"
 #' )
 #' }
-plot_las_3d <- function(las,
+#'
+#' @export
+plot_3d <- function(las,
                         bg = "black",
                         zlim = NULL,
                         height_palette = NULL,
