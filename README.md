@@ -127,8 +127,58 @@ library(lidR)
 las <- readLAS(system.file("extdata", "las", "trees.laz",
                            package = "FuelDeep3D"))
 
-# Visualize by elevation
-plot(las, color = "Z", pal = height.colors(30), bg='white')
+# las <- readLAS("path/to/your_file.laz")
+
+# 1) Default plot (black bg, legend on, thickness by height)
+
+plot_3d(las)
+
+# 2) Custom palette + white background
+
+plot_3d(
+  las,
+  bg = "white",
+  height_palette = c("purple","blue","cyan","yellow","red"),
+  title = "Custom palette"
+)
+  
+# 3) Fixed Z color scale for comparisons + no legend
+
+plot_3d(
+  las,
+  zlim = c(0, 40),
+  add_legend = FALSE,
+  title = "Fixed Z (0-40), no legend"
+)
+  
+# 4) Turn OFF thickness-by-height; use a single point size
+
+plot_3d(
+  las,
+  size_by_height = FALSE,
+  size = 4,
+  title = "Uniform thicker points"
+)
+  
+# 5) Legend on the LEFT and thicker legend bar
+
+plot_3d(
+  las,
+  legend_side = "left",
+  legend_width_frac = 0.05,
+  title = "Legend left"
+)
+  
+# 6) Make everything thicker (multiplies size_range when size_by_height=TRUE)
+
+plot_3d(
+  las,
+  size = 1.8,
+  size_range = c(1, 7),
+  size_power = 1.2,
+  title = "Thicker points by height"
+)
+
 ```
 
 <p align="center">
@@ -160,6 +210,97 @@ predict(cfg, mode = "overwrite", setup_env = FALSE)
 
 ## 3.1 Predicted Result
 
+### Visualizing predicted classes in R
+
+FuelDeep3D stores per-point predictions in the LAS attribute **`Classification`** (the standard LAS classification field).
+You can visualize these predictions directly in R using an interactive **rgl** window with `plot_las_class_3d()`.
+Points are colored by any discrete field stored in `las@data` (e.g., `"Classification"` for predictions or `"label"` for original labels).
+
+> Note: FuelDeep3D intentionally does **not** draw a fixed legend inside the rgl window.
+> Instead, when `verbose = TRUE`, the function prints a clear **class → name → color** mapping in the R console.
+
+#### Predicted output (Classification)
+
+```r
+library(lidR)
+library(FuelDeep3D)
+
+# Read the predicted LAS/LAZ (predictions stored in las@data$Classification)
+las_pred <- readLAS("trees_predicted.las")
+
+plot_las_class_3d(
+  las_pred,
+  field = "Classification",
+  bg    = "white",
+  title = "Predicted classes (Classification)",
+  verbose = TRUE
+)
+```
+
+#### Compare raw labels vs predicted classes
+
+```r
+las_raw <- readLAS("trees.las")
+
+# Original labels (ground truth) stored in las@data$label
+plot_las_class_3d(las_raw, field = "label", bg = "white", title = "Original labels")
+
+# Predicted labels stored in las@data$Classification
+plot_las_class_3d(las_pred, field = "Classification", bg = "white", title = "Predicted classes")
+```
+
+#### Custom colors and custom class names
+
+```r
+my_cols <- c(
+  "0" = "#1F77B4",  # blue
+  "1" = "#8B4513",  # brown
+  "2" = "#228B22"   # green
+)
+
+my_labs <- c(
+  "0" = "Ground vegetation",
+  "1" = "Branch/Stem",
+  "2" = "Leaves/Foliage"
+)
+
+plot_las_class_3d(
+  las_pred,
+  field = "Classification",
+  class_colors = my_cols,
+  class_labels = my_labs,
+  bg = "white",
+  verbose = TRUE
+)
+```
+
+#### Downsampling (optional for large point clouds): The default setting plots every point (downsample = "none"). If you’re working with a large point cloud, choose a downsampling mode to speed up plotting and keep the visualization responsive.
+
+```r
+plot_las_class_3d(
+  las_pred,
+  field = "Classification",
+  downsample = "voxel",
+  voxel_size = 0.10,
+  size = 2,
+  bg = "white"
+)
+```
+### Important note about color names
+
+Base R does not recognize some CSS color names (for example, `lime`).  
+To avoid errors, prefer **hex codes** (recommended) or use a **valid base R color name**.
+
+```r
+# ✅ hex is safest
+plot_las_class_3d(las_pred, field="Classification",
+                  class_colors = c("black","red","#00FF00"))
+
+# ✅ valid base R name example: "limegreen"
+plot_las_class_3d(las_pred, field="Classification",
+                  class_colors = c("black","red","limegreen"))
+```
+
 ![Example segmentation output](inst/readme/cover2_new.png)
 
 An example of the vegetation segmentation applied to a labeled LAS file.
@@ -170,7 +311,7 @@ Each point is colored by its predicted class (e.g., ground/understory, stem, can
 </p>
 
 In this example, the model was trained on `trees.las` and then used to predict labels for the
-same scene. The output LAS (`trees_predicted.las`) stores predictions in the `classification`
+same scene. The output LAS (`trees_predicted.las`) stores predictions in the `Classification`
 field, which can be visualized in tools like CloudCompare or QGIS using a class-based color ramp.
 
 ---

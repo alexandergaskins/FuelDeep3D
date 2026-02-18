@@ -243,7 +243,7 @@
 #' las <- readLAS("your_file.laz")
 #'
 #' # 1) Predicted classes (default palette; no legend overlay)
-#' plot_las_class_3d(
+#' predicted_plot3d(
 #'   las,
 #'   field = "Classification",
 #'   bg = "white",
@@ -251,7 +251,7 @@
 #' )
 #'
 #' # 2) Raw labels
-#' plot_las_class_3d(
+#' predicted_plot3d(
 #'   las,
 #'   field = "label",
 #'   bg = "black",
@@ -261,7 +261,7 @@
 #' # 3) Named custom colors (stable mapping)
 #' my_cols <- c("0"="#1F77B4", "1"="#8B4513", "2"="#228B22")
 #' my_labs <- c("0"="Ground vegetation", "1"="Leaves/Foliage", "2"="Branch/Stem")
-#' plot_las_class_3d(
+#' predicted_plot3d(
 #'   las,
 #'   field = "Classification",
 #'   class_colors = my_cols,
@@ -271,7 +271,7 @@
 #'
 #' # 4) Unnamed custom colors (assigned in class order)
 #' # If classes are 0,1,2 this maps 0->black, 1->red, 2->green.
-#' plot_las_class_3d(
+#' predicted_plot3d(
 #'   las,
 #'   field = "Classification",
 #'   show_all_classes = c(0,1,2),
@@ -280,7 +280,7 @@
 #' )
 #'
 #' # 5) Downsample (voxel) for huge point clouds
-#' plot_las_class_3d(
+#' predicted_plot3d(
 #'   las,
 #'   field = "Classification",
 #'   downsample = "voxel",
@@ -290,7 +290,7 @@
 #' )
 #'
 #' # 6) Thickness by height
-#' plot_las_class_3d(
+#' predicted_plot3d(
 #'   las,
 #'   field = "Classification",
 #'   size = 1.2,
@@ -300,7 +300,7 @@
 #' )
 #' }
 #' @export
-plot_las_class_3d <- function(las,
+predicted_plot3d <- function(las,
                               field = "Classification",
                               bg = "white",
                               title = "LAS 3D View",
