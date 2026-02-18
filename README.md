@@ -213,7 +213,7 @@ predict(cfg, mode = "overwrite", setup_env = FALSE)
 ### Visualizing predicted classes in R
 
 FuelDeep3D stores per-point predictions in the LAS attribute **`Classification`** (the standard LAS classification field).
-You can visualize these predictions directly in R using an interactive **rgl** window with `plot_las_class_3d()`.
+You can visualize these predictions directly in R using an interactive **rgl** window with `predicted_plot3d()`.
 Points are colored by any discrete field stored in `las@data` (e.g., `"Classification"` for predictions or `"label"` for original labels).
 
 > Note: FuelDeep3D intentionally does **not** draw a fixed legend inside the rgl window.
@@ -228,7 +228,7 @@ library(FuelDeep3D)
 # Read the predicted LAS/LAZ (predictions stored in las@data$Classification)
 las_pred <- readLAS("trees_predicted.las")
 
-plot_las_class_3d(
+predicted_plot3d(
   las_pred,
   field = "Classification",
   bg    = "white",
@@ -243,10 +243,10 @@ plot_las_class_3d(
 las_raw <- readLAS("trees.las")
 
 # Original labels (ground truth) stored in las@data$label
-plot_las_class_3d(las_raw, field = "label", bg = "white", title = "Original labels")
+predicted_plot3d(las_raw, field = "label", bg = "white", title = "Original labels")
 
 # Predicted labels stored in las@data$Classification
-plot_las_class_3d(las_pred, field = "Classification", bg = "white", title = "Predicted classes")
+predicted_plot3d(las_pred, field = "Classification", bg = "white", title = "Predicted classes")
 ```
 
 #### Custom colors and custom class names
@@ -264,7 +264,7 @@ my_labs <- c(
   "2" = "Leaves/Foliage"
 )
 
-plot_las_class_3d(
+predicted_plot3d(
   las_pred,
   field = "Classification",
   class_colors = my_cols,
@@ -277,7 +277,7 @@ plot_las_class_3d(
 #### Downsampling (optional for large point clouds): The default setting plots every point (downsample = "none"). If you’re working with a large point cloud, choose a downsampling mode to speed up plotting and keep the visualization responsive.
 
 ```r
-plot_las_class_3d(
+predicted_plot3d(
   las_pred,
   field = "Classification",
   downsample = "voxel",
@@ -293,11 +293,11 @@ To avoid errors, prefer **hex codes** (recommended) or use a **valid base R colo
 
 ```r
 # ✅ hex is safest
-plot_las_class_3d(las_pred, field="Classification",
+predicted_plot3d(las_pred, field="Classification",
                   class_colors = c("black","red","#00FF00"))
 
 # ✅ valid base R name example: "limegreen"
-plot_las_class_3d(las_pred, field="Classification",
+predicted_plot3d(las_pred, field="Classification",
                   class_colors = c("black","red","limegreen"))
 ```
 
