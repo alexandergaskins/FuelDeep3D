@@ -46,7 +46,7 @@ it often duplicates the weighted recall/accuracy in multi-class settings.
 \examples{
 \dontrun{
 library(lidR)
-las <- readLAS("C:/Users/vs.naga/Documents/Github/FuelDeep3D/inst/extdata/las/trees.laz")
+las <- readLAS("C:/path/to/your_file.laz")
 
 res <- evaluate_single_las(
   las,

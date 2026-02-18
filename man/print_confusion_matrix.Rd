@@ -49,7 +49,7 @@ Prints a confusion matrix as a readable table. You can pass either:
 \examples{
 \dontrun{
 library(lidR)
-las <- readLAS("C:/Users/vs.naga/Documents/Github/FuelDeep3D/inst/extdata/las/trees.laz")
+las <- readLAS("C:/path/to/your_file.laz")
 
 print_confusion_matrix(
   las,
