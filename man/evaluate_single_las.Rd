@@ -35,7 +35,7 @@ If \code{NULL}, inferred from observed truth and pred values.}
 \item{show_codes}{Logical. If \code{TRUE} (default), class labels display like \code{"0 (Ground)"}.}
 }
 \value{
-A list containing the confusion matrix and metrics.
+A list containing confusion matrix and metrics.
 }
 \description{
 Computes a confusion matrix and standard multi-class metrics when both the

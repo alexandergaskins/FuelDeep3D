@@ -12,3 +12,10 @@ py_setup(envdir = NULL)
 \description{
 Create/use a venv and install Python deps listed in extdata/python/requirements.txt
 }
+\examples{
+\dontrun{
+# Creates/uses a Python virtualenv and installs requirements.txt
+env <- py_setup()
+env
+}
+}

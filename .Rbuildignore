@@ -10,5 +10,4 @@
 .RDataTmp/
 .Rhistory
 .RData
-^LICENSE$
 .Rproj.user/

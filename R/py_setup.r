@@ -1,5 +1,11 @@
 #' Create/use a venv and install Python deps listed in extdata/python/requirements.txt
 #' @param envdir Path to the Python environment directory.
+#' @examples
+#' \dontrun{
+#' # Creates/uses a Python virtualenv and installs requirements.txt
+#' env <- py_setup()
+#' env
+#' }
 #' @export
 py_setup <- function(envdir = NULL) {
   # Locate the installed python directory from extdata/python

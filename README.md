@@ -2,16 +2,13 @@
   <img src="inst/readme/banner.png" alt="Single tree segmentation output" width="100%">
 </p>
 
-<!-- This is a comment. [![R-hub](https://github.com/venkatasivanaga/FuelDeep3D/.github/workflows/r.yml/badge.svg)](https://github.com/venkatasivanaga/FuelDeep3D/actions/workflows/rhub.yaml)  --> 
-
-[![R-CMD-check](https://github.com/venkatasivanaga/FuelDeep3D/actions/workflows/r.yml/badge.svg?branch=main)](https://github.com/venkatasivanaga/FuelDeep3D/actions/workflows/r.yml)
+[![R-hub](https://github.com/venkatasivanaga/FuelDeep3D/.github/workflows/r.yml/badge.svg)](https://github.com/venkatasivanaga/FuelDeep3D/actions/workflows/rhub.yaml)
 [![CRAN](https://www.r-pkg.org/badges/version/FuelDeep3D)](https://cran.r-project.org/package=FuelDeep3D)
 ![GitHub](https://img.shields.io/badge/GitHub-0.1.0-green.svg)
 ![licence](https://img.shields.io/badge/Licence-GPL--3-blue.svg)
 ![Downloads](https://cranlogs.r-pkg.org/badges/grand-total/FuelDeep3D)
 [![Build Status](https://app.travis-ci.com/venkatasivanaga/FuelDeep3D.svg?branch=main)](https://app.travis-ci.com/venkatasivanaga/FuelDeep3D)
-
-<!-- This is a comment. [![FuelDeep3D statusbadge](https://venkatasivanaga.dev/badges/FuelDeep3D)](https://venkatasivanaga.r-universe.dev/FuelDeep3D)  --> 
+[![FuelDeep3D statusbadge](https://venkatasivanaga.dev/badges/FuelDeep3D)](https://venkatasivanaga.r-universe.dev/FuelDeep3D)
 
 # FuelDeep3D: An R package for Fire Fuels Segmentation in 3D Using Terrestrial Laser Scanning and Deep Learning  
 
@@ -103,9 +100,6 @@ ensure_py_env("pointnext")   # creates env + installs deps the first time
 py_config()
 
 ```
-
-> **Note (Troubleshooting):** If you run into any Conda/reticulate issues while creating or activating the `pointnext` environment (e.g., R picks the wrong Python, `py_config()` shows an unexpected interpreter, or you see missing-module/DLL errors), refer to the **[Conda + R (reticulate) Troubleshooting Guide](inst/readme/conda_reticulate_troubleshooting.md)** for step-by-step diagnostics and fixes.
-
 ---
 
 ## 2. Visualization of a 3D point cloud
@@ -127,58 +121,8 @@ library(lidR)
 las <- readLAS(system.file("extdata", "las", "trees.laz",
                            package = "FuelDeep3D"))
 
-# las <- readLAS("path/to/your_file.laz")
-
-# 1) Default plot (black bg, legend on, thickness by height)
-
-plot_3d(las)
-
-# 2) Custom palette + white background
-
-plot_3d(
-  las,
-  bg = "white",
-  height_palette = c("purple","blue","cyan","yellow","red"),
-  title = "Custom palette"
-)
-  
-# 3) Fixed Z color scale for comparisons + no legend
-
-plot_3d(
-  las,
-  zlim = c(0, 40),
-  add_legend = FALSE,
-  title = "Fixed Z (0-40), no legend"
-)
-  
-# 4) Turn OFF thickness-by-height; use a single point size
-
-plot_3d(
-  las,
-  size_by_height = FALSE,
-  size = 4,
-  title = "Uniform thicker points"
-)
-  
-# 5) Legend on the LEFT and thicker legend bar
-
-plot_3d(
-  las,
-  legend_side = "left",
-  legend_width_frac = 0.05,
-  title = "Legend left"
-)
-  
-# 6) Make everything thicker (multiplies size_range when size_by_height=TRUE)
-
-plot_3d(
-  las,
-  size = 1.8,
-  size_range = c(1, 7),
-  size_power = 1.2,
-  title = "Thicker points by height"
-)
-
+# Visualize by elevation
+plot(las, color = "Z", pal = height.colors(30), bg='white')
 ```
 
 <p align="center">
@@ -210,97 +154,6 @@ predict(cfg, mode = "overwrite", setup_env = FALSE)
 
 ## 3.1 Predicted Result
 
-### Visualizing predicted classes in R
-
-FuelDeep3D stores per-point predictions in the LAS attribute **`Classification`** (the standard LAS classification field).
-You can visualize these predictions directly in R using an interactive **rgl** window with `predicted_plot3d()`.
-Points are colored by any discrete field stored in `las@data` (e.g., `"Classification"` for predictions or `"label"` for original labels).
-
-> Note: FuelDeep3D intentionally does **not** draw a fixed legend inside the rgl window.
-> Instead, when `verbose = TRUE`, the function prints a clear **class → name → color** mapping in the R console.
-
-#### Predicted output (Classification)
-
-```r
-library(lidR)
-library(FuelDeep3D)
-
-# Read the predicted LAS/LAZ (predictions stored in las@data$Classification)
-las_pred <- readLAS("trees_predicted.las")
-
-predicted_plot3d(
-  las_pred,
-  field = "Classification",
-  bg    = "white",
-  title = "Predicted classes (Classification)",
-  verbose = TRUE
-)
-```
-
-#### Compare raw labels vs predicted classes
-
-```r
-las_raw <- readLAS("trees.las")
-
-# Original labels (ground truth) stored in las@data$label
-predicted_plot3d(las_raw, field = "label", bg = "white", title = "Original labels")
-
-# Predicted labels stored in las@data$Classification
-predicted_plot3d(las_pred, field = "Classification", bg = "white", title = "Predicted classes")
-```
-
-#### Custom colors and custom class names
-
-```r
-my_cols <- c(
-  "0" = "#1F77B4",  # blue
-  "1" = "#8B4513",  # brown
-  "2" = "#228B22"   # green
-)
-
-my_labs <- c(
-  "0" = "Ground vegetation",
-  "1" = "Branch/Stem",
-  "2" = "Leaves/Foliage"
-)
-
-predicted_plot3d(
-  las_pred,
-  field = "Classification",
-  class_colors = my_cols,
-  class_labels = my_labs,
-  bg = "white",
-  verbose = TRUE
-)
-```
-
-#### Downsampling (optional for large point clouds): The default setting plots every point (downsample = "none"). If you’re working with a large point cloud, choose a downsampling mode to speed up plotting and keep the visualization responsive.
-
-```r
-predicted_plot3d(
-  las_pred,
-  field = "Classification",
-  downsample = "voxel",
-  voxel_size = 0.10,
-  size = 2,
-  bg = "white"
-)
-```
-### Important note about color names
-
-Base R does not recognize some CSS color names (for example, `lime`).  
-To avoid errors, prefer **hex codes** (recommended) or use a **valid base R color name**.
-
-```r
-# ✅ hex is safest
-predicted_plot3d(las_pred, field="Classification",
-                  class_colors = c("black","red","#00FF00"))
-
-# ✅ valid base R name example: "limegreen"
-predicted_plot3d(las_pred, field="Classification",
-                  class_colors = c("black","red","limegreen"))
-```
-
 ![Example segmentation output](inst/readme/cover2_new.png)
 
 An example of the vegetation segmentation applied to a labeled LAS file.
@@ -311,7 +164,7 @@ Each point is colored by its predicted class (e.g., ground/understory, stem, can
 </p>
 
 In this example, the model was trained on `trees.las` and then used to predict labels for the
-same scene. The output LAS (`trees_predicted.las`) stores predictions in the `Classification`
+same scene. The output LAS (`trees_predicted.las`) stores predictions in the `classification`
 field, which can be visualized in tools like CloudCompare or QGIS using a class-based color ramp.
 
 ---
@@ -534,7 +387,7 @@ FuelDeep3D includes evaluation utilities to measure segmentation quality using L
   ```
 
 <p align="center">
-  <img src="inst/readme/confusion_matrix.png" alt="Confusion Matrix" width="45%">
+  <img src="inst/readme/heat_map_1.png" alt="Confusion Matrix" width="45%">
 </p>
 
    Row-normalized heatmap (proportion per true class; easier to compare classes)
@@ -547,7 +400,7 @@ FuelDeep3D includes evaluation utilities to measure segmentation quality using L
   )
   ```
 <p align="center">
-  <img src="inst/readme/confusion_matrix_row_norm.png" alt="Confusion Matrix" width="45%">
+  <img src="inst/readme/heat_map_2.png" alt="Confusion Matrix" width="45%">
 </p>
 
 
@@ -556,20 +409,7 @@ FuelDeep3D includes evaluation utilities to measure segmentation quality using L
   ### 5.5 Class Distribution Summary
 
   ```r
-  las <- lidR::readLAS("C:/path/to/your_file.laz")
-
-  # Predicted class summary
-  las_class_distribution(las, field = "Classification")
-  
-  # Raw/original label summary
-  las_class_distribution(las, field = "label")
-  
-  # With readable names
-  labs <- c("0"="Ground vegetation", "1"="Branch/Stem", "2"="Leaves/Foliage")
-  las_class_distribution(las, field = "Classification", class_labels = labs)
-  
-  # Drop NA class (if any)
-  las_class_distribution(las, field = "Classification", include_na = FALSE)
+  class_summary(las)
   ```
 
   Shows how many points belong to each predicted class.
@@ -582,12 +422,7 @@ FuelDeep3D includes evaluation utilities to measure segmentation quality using L
 
 # Acknowledgements
 
-FuelDeep3D was supported by the following projects and programs:
-
-- **ESTCP – FuelsCraft:** An innovative wildland fuel mapping tool for prescribed fire decision support on Department of Defense military installations (**#RC23-7779**)
-- **EMS4D:** MultiScale Fuel Mapping and Decision Support System for the Next Generation of Fire Management (**#22-2-02-15**)
-- **NASA:** ICESat-2 (**Grant #80NSSC23K0941**), Carbon Monitoring System (CMS; **Grant #80NSSC23K1257**), and Commercial Smallsat Data Scientific Analysis (CSDSA; **Grant #80NSSC24K0055**)
-- **Object-Based Aggregation of Fuel Structures, Physics-Based Fire Behavior and Self-Organizing Smoke Plumes for Improved Fuel, Fire, and Smoke Management on Military Lands** (**#RC20-1346**)
+We gratefully acknowledge ------------
 
 # Reporting Issues
 

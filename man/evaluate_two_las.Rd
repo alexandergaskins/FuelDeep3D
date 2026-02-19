@@ -38,15 +38,15 @@ If \code{NULL}, inferred from observed truth and pred values.}
 \item{show_codes}{Logical. If \code{TRUE} (default), class labels display like \code{"0 (Ground)"}.}
 }
 \value{
-A list containing the confusion matrix and metrics.
+A list containing confusion matrix and metrics.
 }
 \description{
-Computes the confusion matrix and metrics when ground truth and predictions come from
+Computes confusion matrix and metrics when ground truth and predictions come from
 two separate \code{lidR::LAS} objects.
 }
 \details{
-\strong{Important:} This assumes the LAS objects are point-wise aligned (with the same points and order).
-If they are not aligned, metrics will be meaningless.
+\strong{Important:} This assumes the LAS objects are point-wise aligned (same points,
+same order). If they are not aligned, metrics will be meaningless.
 }
 \examples{
 \dontrun{

@@ -24,7 +24,7 @@ above a user-defined height threshold. Points at or below the threshold are
 preserved unchanged.
 }
 \details{
-The filter is applied only to points with \code{Z} is greater than \code{height_thresh}.
+The filter is applied only to points with \code{Z > height_thresh}.
 For each of these points, the mean distance to its \code{k} nearest neighbors
 is computed in 3D XYZ space. A point is kept if:
 \deqn{d_i < mean(d) + zscore * sd(d)}

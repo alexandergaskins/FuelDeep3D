@@ -29,7 +29,7 @@ Invisibly returns a \code{data.frame} with per-class metrics and optional summar
 \description{
 Formats and prints a per-class metrics table from the output of
 \code{\link{evaluate_single_las}} or \code{\link{evaluate_two_las}}.
-The table includes per-class Support, Accuracy, Precision, Recall, and F1.
+The table includes per-class Support, Accuracy (Recall), Precision, Recall, and F1.
 Optionally includes Macro and Weighted averages, and an Overall accuracy row.
 }
 \details{
@@ -46,7 +46,7 @@ it often duplicates the weighted recall/accuracy in multi-class settings.
 \examples{
 \dontrun{
 library(lidR)
-las <- readLAS("C:/path/to/your_file.laz")
+las <- readLAS("C:/Users/vs.naga/Documents/Github/FuelDeep3D/inst/extdata/las/trees.laz")
 
 res <- evaluate_single_las(
   las,

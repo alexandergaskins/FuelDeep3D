@@ -55,7 +55,7 @@
 #'   block_size = 6, stride = 1, sample_n = 4096,
 #'   repeat_per_tile = 4, min_pts_tile = 512,
 #'   cell_size = 0.25, quantile = 0.05,
-#'   delete_tiles_after_train = TRUE
+#'   delete_tiles_after_train = True
 #' )
 #' 
 #' res <- train(cfg, setup_env = FALSE)        # trains & saves best .pth
@@ -105,7 +105,8 @@ train <- function(cfg, setup_env = FALSE) {
       REPEAT_PER_TILE = cfg$repeat_per_tile,
       MIN_PTS_TILE    = cfg$min_pts_tile,
       CELL_SIZE       = cfg$cell_size,
-      QUANTILE        = cfg$quantile
+      QUANTILE        = cfg$quantile,
+      DELETE_TILES_AFTER_TRAIN = cfg$delete_tiles_after_train
     )
   } else {
     message(">> Found existing NPZ tiles in ", train_dir, " -> skipping preprocessing.")

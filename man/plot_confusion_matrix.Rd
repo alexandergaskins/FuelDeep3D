@@ -13,75 +13,27 @@ plot_confusion_matrix(
   show_values = TRUE,
   class_names = NULL,
   show_codes = FALSE,
-  flip_y = TRUE,
-  palette_type = c("default", "viridis", "brewer", "gradient", "base"),
-  palette_name = NULL,
-  brewer_direction = 1,
-  gradient_low = "white",
-  gradient_high = "#132B43",
-  gradient_mid = NULL,
-  base_n = 256,
-  na_fill = "grey90",
-  label_size = 4,
-  auto_label_color = TRUE,
-  label_color_dark = "white",
-  label_color_light = "black"
+  flip_y = TRUE
 )
 }
 \arguments{
-\item{cm}{A confusion matrix (table or matrix). Rows = true class, columns = predicted class.}
+\item{cm}{Confusion matrix (table or matrix).}
 
-\item{las_name}{Optional character. A short LAS/LAZ filename label appended to the title.}
+\item{las_name}{Optional character. If provided, appended to the title.}
 
 \item{title}{Character. Plot title.}
 
-\item{row_normalize}{Logical. If TRUE, normalize each row so it sums to 1 (proportions).}
+\item{row_normalize}{Logical. If \code{TRUE}, normalize each row to proportions.}
 
-\item{digits}{Integer. Number of decimal digits to show when row_normalize = TRUE.}
+\item{digits}{Integer. Rounding digits for displayed values when \code{row_normalize = TRUE}.}
 
-\item{show_values}{Logical. If TRUE, print values inside cells.}
+\item{show_values}{Logical. If \code{TRUE}, draw numbers in each cell.}
 
-\item{class_names}{Optional named character vector mapping class codes to readable names.
-Example: c("0"="Ground","1"="Leaves","2"="Branch").}
+\item{class_names}{Optional class name mapping (named or unnamed).}
 
-\item{show_codes}{Logical. If TRUE, show both code + name on axes (e.g., "1 - Stem").}
+\item{show_codes}{Logical. If \code{TRUE}, axis labels include codes like \code{"0 (Ground)"}.}
 
-\item{flip_y}{Logical. If TRUE, reverses y-axis order (often looks more like a typical CM).}
-
-\item{palette_type}{Character. Color palette strategy for the heatmap.
-Common options include \code{"viridis"}, \code{"brewer"}, and \code{"gradient"}.}
-
-\item{palette_name}{Character. Palette name used when \code{palette_type} supports
-named palettes (e.g., viridis option name or RColorBrewer palette name).}
-
-\item{brewer_direction}{Integer. Direction for RColorBrewer palettes.
-Use \code{1} for default direction, \code{-1} to reverse.}
-
-\item{gradient_low}{Character. Low-end color for \code{palette_type="gradient"}.
-Can be any valid R color (e.g., \code{"white"} or \code{"#FFFFFF"}).}
-
-\item{gradient_high}{Character. High-end color for \code{palette_type="gradient"}.
-Can be any valid R color.}
-
-\item{gradient_mid}{Character. Mid-point color for \code{palette_type="gradient"}.
-Can be any valid R color.}
-
-\item{base_n}{Integer. Number of colors to generate for discrete palettes
-(used when generating a ramp for the heatmap).}
-
-\item{na_fill}{Character. Fill color used for \code{NA} cells in the heatmap.}
-
-\item{label_size}{Numeric. Text size for cell labels (counts/percentages) and/or axis labels,
-depending on your implementation.}
-
-\item{auto_label_color}{Logical. If \code{TRUE}, automatically chooses a readable label
-text color based on the cell fill (improves contrast).}
-
-\item{label_color_dark}{Character. Label text color to use on light cells when
-\code{auto_label_color=TRUE}.}
-
-\item{label_color_light}{Character. Label text color to use on dark cells when
-\code{auto_label_color=TRUE}.}
+\item{flip_y}{Logical. If \code{TRUE}, show first class at the top (common confusion-matrix style).}
 }
 \value{
 A ggplot object (invisibly).
@@ -93,83 +45,15 @@ each row is converted to proportions so rows sum to 1.
 \examples{
 \dontrun{
 library(lidR)
+las <- readLAS("C:/Users/vs.naga/Documents/Github/FuelDeep3D/inst/extdata/las/trees.laz")
 
-# Read LAS/LAZ
-las <- readLAS("C:/path/to/your_file.laz")
-
-# Confusion matrix: True labels vs Predicted class (LAS Classification)
 cm <- table(True = las@data$label, Pred = las@data$Classification)
 
-# ------------------------------------------------------------
-# 1) Row-normalized confusion matrix (Proportions)
-#    - Best to understand per-class recall behavior
-#    - row_normalize = TRUE is important here
-# ------------------------------------------------------------
 plot_confusion_matrix(
   cm,
   row_normalize = TRUE,
   las_name = "trees.laz",
-  title = "Confusion Matrix (Row-normalized)",
-  class_names = c("0" = "Ground", "1" = "Leaves", "2" = "Branch"),
-  palette_type = "viridis",
-  palette_name = "cividis"
-)
-
-# ------------------------------------------------------------
-# 2) Counts confusion matrix (Raw counts)
-#    - Shows absolute misclassification volume
-#    - row_normalize = FALSE is important here
-# ------------------------------------------------------------
-plot_confusion_matrix(
-  cm,
-  row_normalize = FALSE,
-  las_name = "trees.laz",
-  title = "Confusion Matrix (Counts)",
-  class_names = c("0" = "Ground", "1" = "Leaves", "2" = "Branch"),
-  palette_type = "viridis",
-  palette_name = "viridis"
-)
-
-# ------------------------------------------------------------
-# 3) Brewer palette example (soft + classic)
-#    - Works great for both normalized and counts
-# ------------------------------------------------------------
-plot_confusion_matrix(
-  cm,
-  row_normalize = TRUE,
-  las_name = "trees.laz",
-  title = "Confusion Matrix (Brewer Blues, Row-normalized)",
-  class_names = c("0" = "Ground", "1" = "Leaves", "2" = "Branch"),
-  palette_type = "brewer",
-  palette_name = "Blues"
-)
-
-# ------------------------------------------------------------
-# 4) Custom modern gradient (minimal + professional)
-# ------------------------------------------------------------
-plot_confusion_matrix(
-  cm,
-  row_normalize = TRUE,
-  las_name = "trees.laz",
-  title = "Confusion Matrix (Custom Gradient, Row-normalized)",
-  class_names = c("0" = "Ground", "1" = "Leaves", "2" = "Branch"),
-  palette_type = "gradient",
-  gradient_low  = "white",
-  gradient_high = "#2C3E50"
-)
-
-# ------------------------------------------------------------
-# 5) Base palette example (if you still want them)
-#    - heat / terrain / topo / cm / rainbow
-# ------------------------------------------------------------
-plot_confusion_matrix(
-  cm,
-  row_normalize = TRUE,
-  las_name = "trees.laz",
-  title = "Confusion Matrix (Base heat, Row-normalized)",
-  class_names = c("0" = "Ground", "1" = "Leaves", "2" = "Branch"),
-  palette_type = "base",
-  palette_name = "heat"
+  class_names = c("0"="Ground","1"="Branch","2"="Leaves")
 )
 }
 }
