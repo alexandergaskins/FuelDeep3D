@@ -10,19 +10,22 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  R-CMD-check:
     strategy:
       fail-fast: false
       matrix:
         include:
           - os: ubuntu-latest
-            r-version: '4.1.1'
+            r-version: 'release'
           - os: windows-latest
-            r-version: '4.1.1'
+            r-version: 'release'
           - os: macos-latest
-            r-version: '4.1.1'
+            r-version: 'release'
 
     runs-on: ${{ matrix.os }}
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
@@ -32,18 +35,29 @@ jobs:
         with:
           r-version: ${{ matrix.r-version }}
 
-      - name: Install system dependencies (Linux only)
+      # ---- System deps for geospatial + rgl ----
+      - name: Install system dependencies (Linux)
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libglu1-mesa
+          sudo apt-get install -y \
+            libcurl4-openssl-dev libssl-dev libxml2-dev \
+            libgdal-dev libgeos-dev libproj-dev libudunits2-dev \
+            libgl1-mesa-dev libglu1-mesa-dev
 
-      - name: Install dependencies
+      - name: Install system dependencies (macOS)
+        if: runner.os == 'macOS'
         run: |
-          install.packages(c("remotes", "rcmdcheck", "lidR", "reticulate", "ggplot2", "rgl"))
-          remotes::install_deps(dependencies = TRUE)
-        shell: Rscript {0}
+          brew update
+          brew install gdal geos proj udunits
+
+      - name: Install R dependencies
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::rcmdcheck
+          needs: check
 
       - name: Check
-        run: rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
-        shell: Rscript {0}
+        uses: r-lib/actions/check-r-package@v2
+        with:
+          args: 'c("--no-manual")'

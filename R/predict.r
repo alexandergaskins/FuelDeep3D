@@ -19,13 +19,13 @@
 #'
 #'   \item \strong{Optional 4th class (ground):} If \code{cfg$num_classes == 4}, the function
 #'   post-processes the 3-class prediction LAS with \code{\link{add_ground_csf}} to detect ground
-#'   points and assigns them to class \code{3}, producing a final 4-class LAS/LAZ.
+#'   points and assign them to class \code{3}, producing a final 4-class LAS/LAZ.
 #'
 #'   \item \strong{Device selection:} Uses \code{cfg$device} if provided; otherwise selects
 #'   \code{"cuda"} when available and falls back to \code{"cpu"}.
 #' }
 #'
-#' Note: \code{setup_env} is accepted for API compatibility; if you want it to actually run
+#' Note: \code{setup_env} is accepted for API compatibility; if you want it to actually run the
 #' environment setup, add a call such as \code{if (isTRUE(setup_env)) py_setup()} before importing.
 #' 
 #' @param cfg A configuration list created by [config()].
